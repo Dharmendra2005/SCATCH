@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'helvetica': ['Helvetica', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --bg-tertiary: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #374151;
+            --text-tertiary: #6b7280;
+            --border-color: #d1d5db;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1f2937;
+            --bg-secondary: #111827;
+            --bg-tertiary: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #e5e7eb;
+            --text-tertiary: #9ca3af;
+            --border-color: #4b5563;
+            --accent-color: #60a5fa;
+            --accent-hover: #3b82f6;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .bg-primary {
+            background-color: var(--bg-primary);
+        }
+
+        .bg-secondary {
+            background-color: var(--bg-secondary);
+        }
+
+        .bg-tertiary {
+            background-color: var(--bg-tertiary);
+        }
+
+        .text-primary {
+            color: var(--text-primary);
+        }
+
+        .text-secondary {
+            color: var(--text-secondary);
+        }
+
+        .text-tertiary {
+            color: var(--text-tertiary);
+        }
+
+        .border-custom {
+            border-color: var(--border-color);
+        }
+
+        .accent-bg {
+            background-color: var(--accent-color);
+        }
+
+        .accent-hover:hover {
+            background-color: var(--accent-hover);
+        }
+    </style>
+</head>
+
+<body class="font-sans">
+    <nav
+        class="w-full fixed top-0 left-0 px-5 py-3 flex justify-between items-center bg-primary border-b border-custom">
+        <h3 class="text-xl">Scatch</h3>
+
+        <div class="flex gap-4 items-center">
+            <% if (loggedin) { %>
+                <a href="/shop" class="hover:text-blue-500">Shop</a>
+                <a href="/cart" class="hover:text-blue-500">Cart</a>
+                <a href="/logout" class="hover:text-blue-500">Logout</a>
+            <% } %>
+            <button id="theme-toggle" class="p-2 rounded-full bg-secondary hover:bg-tertiary transition-colors">
+                <i class="ri-sun-line text-xl" id="theme-icon"></i>
+            </button>
+        </div>
+    </nav>
