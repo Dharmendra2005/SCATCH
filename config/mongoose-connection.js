@@ -9,6 +9,7 @@ mongoose.connect(`${config.get("MONGODB_URI")}/scatch`)
 })
 .catch(function(err){
     dbgr(err);
+    console.error('MongoDB connection error:', err);
 })
 
 module.exports = mongoose.connection;
