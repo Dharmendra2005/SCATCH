@@ -1,5 +1,6 @@
 const express = require("express");
 const ownerModel = require("../models/owners-model");
+const productModel = require("../models/product-model");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -18,7 +19,7 @@ if (process.env.NODE_ENV === "development") {
           email,
           password: hash,
         });
-        let token = jwt.sign({ email }, "shhhhhhhhhhhhhh");
+        let token = jwt.sign({ email }, process.env.JWT_KEY || "shhhhhhhhhhhhhh");
         res.cookie("token", token);
         res.status(201).send(createdOwner);
       });
@@ -26,11 +27,41 @@ if (process.env.NODE_ENV === "development") {
     // console.log(process.env.NODE_ENV) //to check node environment
   });
 }
-router.get("/", (req, res) => {
-  res.send("hello Dharm U r doing good job till now !");
+
+router.get("/admin", async (req, res) => {
+  try {
+    let success = req.flash("success");
+    let products = await productModel.find().sort({ createdAt: -1 });
+    res.render("createproducts", { success, products });
+  } catch (error) {
+    console.error("Admin panel error:", error);
+    res.render("createproducts", { success: [], products: [] });
+  }
 });
-// router.delete("/delete/all", async (req, res) => {
-//   await ownerModel.deleteMany({});
-//   res.send("All owners deleted");
-// });
+
+// Delete all products
+router.delete("/delete/all", async (req, res) => {
+  try {
+    await productModel.deleteMany({});
+    console.log("All products deleted");
+    res.json({ success: true, message: "All products deleted" });
+  } catch (error) {
+    console.error("Delete all products error:", error);
+    res.status(500).json({ success: false, message: "Failed to delete products" });
+  }
+});
+
+// Delete single product
+router.delete("/delete/:productId", async (req, res) => {
+  try {
+    const productId = req.params.productId;
+    await productModel.findByIdAndDelete(productId);
+    console.log("Product deleted:", productId);
+    res.json({ success: true, message: "Product deleted" });
+  } catch (error) {
+    console.error("Delete product error:", error);
+    res.status(500).json({ success: false, message: "Failed to delete product" });
+  }
+});
+
 module.exports = router;
