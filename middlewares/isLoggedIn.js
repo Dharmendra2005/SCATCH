@@ -1,22 +1,30 @@
-const jwt = require('jsonwebtoken');
-
+const jwt = require("jsonwebtoken");
 const userModel = require("../models/user-model");
 
-const cookieParser = require('cookie-parser');
+const JWT_KEY = process.env.JWT_KEY || "shhhhhhhhhhhhhh";
 
-function isLoggedIn(req, res, next) {
-  if (!req.cookies.token) {
-    req.flash('error', "you need to login first"); //flash - on this route will show this msg and it will work on another route which did redirect
-    return res.redirect("/");
-  }
-  
-  try{
-    let decoded = jwt.verify(req.cookies.token, "shhhhhhhhhhhhhhh"); //for checking coming token is valid or not if yes then store in user
-    let user = userModel.findOne({email: decoded.email}).select("-password");
-    req.user = user;
-    next();
-  } catch(err){
-    req.flash("Error", "Something went wrong");
-    res.redirect("/");
-  }
-};
+async function isLoggedIn(req, res, next) {
+    const token = req.cookies.token;
+    if (!token) {
+        req.flash("error", "You need to login first");
+        return res.redirect("/");
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_KEY);
+        const user = await userModel.findOne({ email: decoded.email }).select("-password");
+        if (!user) {
+            req.flash("error", "User not found");
+            return res.redirect("/");
+        }
+        req.user = user;
+        next();
+    } catch (err) {
+        console.error("Token verification error:", err);
+        req.flash("error", "Session expired, please login again");
+        res.clearCookie("token");
+        return res.redirect("/");
+    }
+}
+
+module.exports = isLoggedIn;
