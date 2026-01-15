@@ -1,0 +1,63 @@
+<script>
+    // Theme switching functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const html = document.documentElement;
+
+    // Check for saved theme preference or default to light
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', () => {
+        const theme = html.getAttribute('data-theme');
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        if (theme === 'dark') {
+            themeIcon.classList.remove('ri-sun-line');
+            themeIcon.classList.add('ri-moon-line');
+        } else {
+            themeIcon.classList.remove('ri-moon-line');
+            themeIcon.classList.add('ri-sun-line');
+        }
+    }
+
+    // Apply theme classes to existing elements
+    function applyThemeClasses() {
+        const theme = html.getAttribute('data-theme');
+        
+        // Update background elements
+        document.querySelectorAll('.bg-white, .bg-gray-50, .bg-gray-100').forEach(el => {
+            el.classList.add('bg-primary');
+        });
+        
+        document.querySelectorAll('.bg-gray-200, .bg-gray-300').forEach(el => {
+            el.classList.add('bg-secondary');
+        });
+        
+        // Update text elements
+        document.querySelectorAll('.text-gray-900, .text-gray-800').forEach(el => {
+            el.classList.add('text-primary');
+        });
+        
+        document.querySelectorAll('.text-gray-600, .text-gray-700').forEach(el => {
+            el.classList.add('text-secondary');
+        });
+        
+        // Update borders
+        document.querySelectorAll('.border-gray-200, .border-gray-300').forEach(el => {
+            el.classList.add('border-custom');
+        });
+    }
+
+    // Apply theme classes when DOM is loaded
+    document.addEventListener('DOMContentLoaded', applyThemeClasses);
+</script>
+</body>
+</html>
