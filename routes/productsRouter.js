@@ -5,26 +5,26 @@ const productModel = require("../models/product-model");
 const router = express.Router();
 
 // Test route to create sample products
-router.get("/create-sample", async (req, res) => {
-  try {
-    // Create a sample product without image for testing
-    const sampleProduct = await productModel.create({
-      name: "Sample Product",
-      price: 999,
-      discount: 10,
-      bgcolor: "#f3f4f6",
-      panelcolor: "#e5e7eb",
-      textcolor: "#111827",
-      image: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", 'base64')
-    });
+// router.get("/create-sample", async (req, res) => {
+//   try {
+//     // Create a sample product without image for testing
+//     const sampleProduct = await productModel.create({
+//       name: "Sample Product",
+//       price: 999,
+//       discount: 10,
+//       bgcolor: "#f3f4f6",
+//       panelcolor: "#e5e7eb",
+//       textcolor: "#111827",
+//       image: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", 'base64')
+//     });
     
-    console.log("Sample product created:", sampleProduct);
-    res.redirect("/shop");
-  } catch (error) {
-    console.error("Error creating sample product:", error);
-    res.send("Error creating sample product");
-  }
-});
+//     console.log("Sample product created:", sampleProduct);
+//     res.redirect("/shop");
+//   } catch (error) {
+//     console.error("Error creating sample product:", error);
+//     res.send("Error creating sample product");
+//   }
+// });
 
 router.post("/create", upload.single("image"), (req, res) => {
   try {
