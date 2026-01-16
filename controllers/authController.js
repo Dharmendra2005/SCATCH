@@ -21,7 +21,8 @@ module.exports.registerUser = async function (req, res){
         });
         let token = generateToken(user);
         res.cookie("token", token);
-        res.status(201).send("Your registeration is successfuly");
+        req.flash("success", "Your registration is successfuly");
+        return res.redirect("/");
       });
     });
   } catch (err) {
@@ -33,8 +34,10 @@ module.exports.loginUser = async function (req, res){
     let {email, password}  = req.body;
 
     let user = await userModel.findOne({email: email});
-    console.log(user);
-    if(!user) return res.status(403).send("Email or Password incorrect.");
+    if(!user) {
+       req.flash("error", "Email or Password incorrect.");
+       return res.redirect("/");
+    }
 
     bcrypt.compare(password, user.password, async (err, result) => {
         if(result){
@@ -43,7 +46,8 @@ module.exports.loginUser = async function (req, res){
             let products = await productModel.find();
             res.render("shop", { products });
         }else{
-            return res.status(403).send("Email or Password incorrect.");
+             req.flash("error", "Email or Password incorrect.");
+             return res.redirect("/");
         }
     })
 }
