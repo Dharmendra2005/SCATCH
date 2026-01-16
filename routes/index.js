@@ -6,10 +6,14 @@ const isLoggedIn = require("../middlewares/isLoggedIn");
 const productModel = require("../models/product-model");
 const userModel = require("../models/user-model");
 
+//POST → flash → redirect → GET → render → show flash
+
 router.get("/", function (req, res) {
   let error = req.flash("error");
+  let success = req.flash("success"); // Retrieve the success message
   res.render("index", {
     error: error,
+    success: success, // Pass it to the template
     loggedin: req.cookies.token ? true : false
   });
 });
@@ -42,9 +46,12 @@ router.get("/shop", isLoggedIn, async (req, res) => {
       products = products.filter(product => product.discount > 0);
     }
     
+
+    let error = req.flash("error");
+    let success = req.flash("success");
     console.log("Products found:", products.length);
     console.log("Filters applied:", { sortby, category, discount, available });
-    res.render("shop", { products, loggedin: true });
+    res.render("shop", { products, loggedin: true, error, success });
   } catch (error) {
     console.error("Shop error:", error);
     res.render("shop", { products: [], loggedin: true });
@@ -128,10 +135,20 @@ router.post("/checkout", isLoggedIn, async (req, res) => {
   }
 });
 
+//Admin Access
+router.get("/create", (req, res) => {
+  res.render("owner-login")
+});
+
+router.post("/create", (req, res) =>{
+  res.render("admin");
+})
+
 router.get("/logout", (req, res)=> {
   console.log("User logging out");
   res.clearCookie("token");
   res.redirect("/");
 })
+
 
 module.exports = router;
