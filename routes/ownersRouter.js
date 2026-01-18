@@ -4,12 +4,13 @@ const productModel = require("../models/product-model");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const isOwnerLoggedIn = require("../middlewares/isOwnerLoggedIn");
 
 if (process.env.NODE_ENV === "development") {
   router.post("/create", async (req, res) => {
     let owners = await ownerModel.find();
     if (owners.length > 0) {
-      return res.status(504).send("you have not permission to creaet owner");
+      return res.status(504).send("you have not permission to create product");
     }
     let { fullname, email, password } = req.body;
     bcrypt.genSalt(10, (err, salt) => {
@@ -28,7 +29,7 @@ if (process.env.NODE_ENV === "development") {
   });
 }
 
-router.get("/admin", async (req, res) => {
+router.get("/admin", isOwnerLoggedIn, async (req, res) => {
   try {
     let success = req.flash("success");
     let products = await productModel.find().sort({ createdAt: -1 });
