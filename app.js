@@ -7,6 +7,7 @@ const app = express();
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const flash = require("express-flash");
+const session = require('express-session');
 const db = require("./config/mongoose-connection");
 const ownersRouter = require("./routes/ownersRouter");
 const usersRouter = require("./routes/usersRouter");
@@ -29,6 +30,7 @@ app.use(
   }),
 );
 app.use(flash());
+app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
 
 app.set("view engine", "ejs");
 app.use(express.json());
