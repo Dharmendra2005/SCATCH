@@ -91,17 +91,38 @@
     <nav
         class="w-full fixed top-0 left-0 px-5 py-3 flex justify-between items-center bg-primary border-b border-custom">
         <h3 class="text-xl">Scatch</h3>
+<div class="flex gap-4 items-center">
 
-        <div class="flex gap-4 items-center">
-            <% if (loggedin) { %>
-                <a href="/shop" class="hover:text-blue-500">Shop</a>
-                <a href="/cart" class="hover:text-blue-500">Cart</a>
-                <a href="/logout" class="hover:text-blue-500">Logout</a>
-            <% } %>
-               <a class="m-3" href="/create" >Admin Access</a>
-            <button id="theme-toggle" class="p-2 rounded-full bg-secondary hover:bg-tertiary transition-colors">
-                <i class="ri-sun-line text-xl" id="theme-icon"></i>
-            </button>
-            
-        </div>
+  <!-- Shop: visible for user OR owner -->
+  <% if (loggedin || ownerLoggedIn) { %>
+    <a href="/shop" class="hover:text-blue-500">Shop</a>
+  <% } %>
+
+  <!-- Cart: only normal users -->
+  <% if (loggedin) { %>
+    <a href="/cart" class="hover:text-blue-500">Cart</a>
+  <% } %>
+
+  <!-- Admin Access: always visible -->
+  <% if (ownerLoggedIn) { %>
+    <a href="/owners/admin" class="hover:text-blue-500">Admin Access</a>
+  <% } else { %>
+    <a href="/create" class="hover:text-blue-500">Admin Access</a>
+  <% } %>
+
+  <!-- Logout: user OR owner -->
+  <% if (loggedin || ownerLoggedIn) { %>
+    <a href="/logout" class="hover:text-blue-500">Logout</a>
+  <% } %>
+
+  <!-- Theme Toggle -->
+  <button
+    id="theme-toggle"
+    class="p-2 rounded-full bg-secondary hover:bg-tertiary transition-colors"
+  >
+    <i class="ri-sun-line text-xl" id="theme-icon"></i>
+  </button>
+
+</div>
+
     </nav>
