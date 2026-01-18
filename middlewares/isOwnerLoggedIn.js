@@ -1,6 +1,14 @@
 const jwt = require("jsonwebtoken");
 
 
+module.exports = (req, res, next) => {
+  if (!req.cookies.owner) {
+    req.flash("error", "Please log in as owner");
+    return res.redirect("/owners/create");
+  }
+  next();
+};
+
 module.exports = function isOwnerLoggedIn(req, res, next) {
   const token = req.cookies.owner;
 
