@@ -207,6 +207,7 @@ router.post("/create", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.send("Something went wrong");
+    
   }
 });
 
