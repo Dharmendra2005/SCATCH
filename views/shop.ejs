@@ -1,68 +1,104 @@
 <%- include('./partials/header') %>
-    <div class="w-full h-screen flex items-start px-20 py-20 bg-primary">
-        <div class="w-[25%] flex h-screen flex-col items-start">
-            <div class="flex items-center gap-2">
-                <h3>sort by</h3>
-                <form action="/shop" method="get">
-                    <select class="border-[1px] mt-1 px-2 py-0 border-primary bg-primary text-primary" name="sortby" onchange="this.form.submit()">
-                        <option value="popular">Popular</option>
-                        <option value="newest">Newest</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
-                    </select>
-                </form>
-            </div>
-            <div class="flex flex-col mt-20">
-                <a class="block w-fit mb-2 hover:text-blue-500" href="/shop?category=new">New Collection</a>
-                <a class="block w-fit mb-2 hover:text-blue-500" href="/shop">All Products</a>
-                <a class="block w-fit mb-2 hover:text-blue-500" href="/shop?discount=true">Discounted Products</a>
-            </div>
-            <div class="mt-32">
-                <h3 class="block w-fit mb-2">Filter by:</h3>
-                <a class="block w-fit mb-2 hover:text-blue-500" href="/shop?available=true">In Stock</a>
-                <a class="block w-fit mb-2 hover:text-blue-500" href="/shop?discount=true">On Sale</a>
-            </div>
+<div class="w-full h-screen flex items-start px-20 py-20 bg-primary">
+    <div class="w-[25%] flex h-screen flex-col items-start">
+        <div class="flex items-center gap-2">
+            <h3>sort by</h3>
+            <form action="/shop" method="get">
+                <select
+                    class="border-[1px] mt-1 px-2 py-0 border-primary bg-primary text-primary"
+                    name="sortby" onchange="this.form.submit()">
+                    <option value="popular">Popular</option>
+                    <option value="newest">Newest</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                </select>
+            </form>
         </div>
-        <div class="w-[75%] flex flex-col gap-3 h-screen overflow-y-auto">
-            <% if(products && products.length > 0) { %>
-            <div class="flex items-start gap-2 flex-wrap">
-                <% products.forEach(function(product){ %>
-                    <div class="w-60 mb-4">
-                        <div class="w-full h-52 flex items-center justify-center bg-[<%= product.bgcolor %>]">
-                            <% if(product.image) { %>
-                                <img class="h-[12rem] object-contain" src="data:image/jpeg;base64,<%= product.image.toString('base64') %>" alt="<%= product.name %>">
-                            <% } else { %>
-                                <span class="text-gray-500">No Image</span>
-                            <% } %>
-                        </div>
-                        <div class="flex justify-between bg-[<%= product.panelcolor %>] items-center px-3 py-4 text-[<%= product.textcolor%>]">
-                            <div>
-                                <h3 class="font-semibold">
-                                    <%= product.name %>
-                                </h3>
-                                <h4 class="text-lg">₹ <%= product.price %></h4>
-                                <% if(product.discount > 0) { %>
-                                    <p class="text-sm text-green-600"><%= product.discount %>% OFF</p>
-                                <% } %>
-                            </div>
-                            <form action="/addtocart/<%= product._id %>" method="post" class="inline">
-                                <button type="submit" class="w-9 h-9 flex items-center justify-center rounded-full text-black bg-white mr-10 hover:bg-gray-600 transition-colors" title="Add to Cart">
-                                    <i class="ri-add-line text-lg"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    <% }) %>
-            </div>
-            <% } else { %>
-                <div class="w-full h-64 flex items-center justify-center">
-                    <div class="text-center">
-                        <h3 class="text-2xl mb-2">No Products Found</h3>
-                        <p class="text-secondary">Try adjusting your filters or check back later</p>
-                        <a href="/products/create-sample" class="mt-4 inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Create Sample Product</a>
-                    </div>
-                </div>
-            <% } %>
+        <div class="flex flex-col mt-20">
+            <a class="block w-fit mb-2 hover:text-blue-500"
+                href="/shop?category=new">New Collection</a>
+            <a class="block w-fit mb-2 hover:text-blue-500" href="/shop">All
+                Products</a>
+            <a class="block w-fit mb-2 hover:text-blue-500"
+                href="/shop?discount=true">Discounted Products</a>
+        </div>
+        <div class="mt-32">
+            <h3 class="block w-fit mb-2">Filter by:</h3>
+            <a class="block w-fit mb-2 hover:text-blue-500"
+                href="/shop?available=true">In Stock</a>
+            <a class="block w-fit mb-2 hover:text-blue-500"
+                href="/shop?discount=true">On Sale</a>
         </div>
     </div>
-    <%- include('./partials/footer') %>
+    <div class="w-[75%] flex flex-col gap-3 h-screen overflow-y-auto">
+        <% if(products && products.length > 0) { %>
+        <div class="flex items-start gap-2 flex-wrap">
+            <% products.forEach(function(product){ %>
+            <div class="w-60 mb-4">
+                <div id="item"
+                    class="w-full h-52 flex items-center justify-center bg-[<%= product.bgcolor %>]">
+                    <% if(product.image) { %>
+                    <img class="h-[12rem] object-contain"
+                        src="data:image/jpeg;base64,<%= product.image.toString('base64') %>"
+                        alt="<%= product.name %>">
+                    <% } else { %>
+                    <span class="text-gray-500">No Image</span>
+                    <% } %>
+                </div>
+                <div
+                    class="flex justify-between bg-[<%= product.panelcolor %>] items-center px-3 py-4 text-[<%= product.textcolor%>]">
+                    <div>
+                        <h3 class="font-semibold">
+                            <%= product.name %>
+                        </h3>
+                        <h4 class="text-lg">₹ <%= product.price %></h4>
+                        <% if(product.discount > 0) { %>
+                        <p class="text-sm text-green-600"><%= product.discount
+                            %>% OFF</p>
+                        <% } %>
+                    </div>
+                    <button
+                        type="button"
+                        onclick="addToCart('<%= product._id %>')"
+                        class="w-9 h-9 flex items-center justify-center rounded-full text-black bg-white mr-10 hover:bg-gray-600 transition-colors">
+                        <i class="ri-add-line text-lg"></i>
+                    </button>
+
+                </div>
+            </div>
+            <% }) %>
+        </div>
+        <% } else { %>
+        <div class="w-full h-64 flex items-center justify-center">
+            <div class="text-center">
+                <h3 class="text-2xl mb-2">No Products Found</h3>
+                <p class="text-secondary">Try adjusting your filters or check
+                    back later</p>
+                <a href="/products/create-sample"
+                    class="mt-4 inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Create
+                    Sample Product</a>
+            </div>
+        </div>
+        <% } %>
+    </div>
+</div>
+<%- include('./partials/footer') %>
+
+<script>
+function addToCart(productId) {
+  fetch(`/addtocart/${productId}`, {
+    method: "post",
+    credentials: "include"
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      // optional UX feedback
+      console.log("Added to cart");
+    } else {
+      console.log(data.message);
+    }
+  })
+  .catch(err => console.error(err));
+}
+</script>
