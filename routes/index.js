@@ -77,12 +77,13 @@ router.get("/cart", isLoggedIn, async (req, res) => {
   }
 });
 
+
 router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
   try {
     const productId = req.params.productId;
     const userId = req.user._id;
 
-    console.log("Adding to cart - Product ID:", productId, "User ID:", userId);
+    // console.log("Adding to cart - Product ID:", productId, "User ID:", userId);
 
     // Check if product exists
     const product = await productModel.findById(productId);
@@ -95,7 +96,7 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
     // Check if product already in cart
     const user = await userModel.findById(userId);
     if (user.cart.includes(productId)) {
-      console.log("Product already in cart");
+      // console.log("Product already in cart");
       req.flash("error", "Product already in cart");
       return res.redirect("/shop");
     }
@@ -114,6 +115,8 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
     res.redirect("/shop");
   }
 });
+
+
 
 router.post("/checkout", isLoggedIn, async (req, res) => {
   try {
