@@ -106,7 +106,6 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
       $push: { cart: productId },
     });
 
-    console.log("Cart updated successfully");
     req.flash("success", "Product added to cart");
     res.redirect("/shop");
   } catch (error) {
