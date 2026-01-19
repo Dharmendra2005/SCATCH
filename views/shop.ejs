@@ -94,9 +94,10 @@ function addToCart(productId) {
   .then(data => {
     if (data.success) {
       // optional UX feedback
-      console.log("Added to cart");
+      console.log("yes product added to Cart")
+      req.flash("success", "Added to Cart");
     } else {
-      console.log(data.message);
+      req.flash("error", "Didnot added");
     }
   })
   .catch(err => console.error(err));
