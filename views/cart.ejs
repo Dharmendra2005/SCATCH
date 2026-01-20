@@ -1,102 +1,110 @@
 <%- include('./partials/header') %>
 
-<div class="w-full min-h-screen flex items-start px-12 py-16 gap-12">
+<div class="w-full min-h-screen flex items-start px-10 py-16 gap-10">
 
   <!-- CART ITEMS -->
-  <div class="w-[80%] mt-5">
+  <div class="w-[80%] mt-5 px-3 overflow-y-auto max-h-[80vh]">
 
     <% if (cartItems && cartItems.length > 0) { %>
 
-      <!-- GRID: 4 ITEMS PER ROW -->
-      <div class="grid grid-cols-3 gap-6">
+    <!-- GRID: 4 ITEMS PER ROW -->
+    <div class="grid grid-cols-4 gap-6">
 
-        <% cartItems.forEach(function(item) { %>
+      <% cartItems.forEach(function(item) { %>
 
-          <!-- CARD -->
-          <div class=" overflow-hidden">
+      <!-- CARD -->
+      <div class="rounded-lg shadow-lg overflow-hidden">
 
-            <!-- IMAGE -->
-            <div class="h-48 flex items-center justify-center">
-              <% if (item.image) { %>
-                <img
-                  class="h-36 object-contain"
-                  src="data:image/jpeg;base64,<%= item.image.toString('base64') %>"
-                  alt="<%= item.name %>" />
-              <% } else { %>
-                <span class="text-gray-500">No Image</span>
-              <% } %>
+        <!-- IMAGE -->
+        <div class="h-48 flex items-center justify-center">
+          <% if (item.image) { %>
+            <img
+              class="h-36 object-contain"
+              src="data:image/jpeg;base64,<%= item.image.toString('base64') %>"
+              alt="<%= item.name %>" />
+          <% } else { %>
+            <span class="text-gray-500">No Image</span>
+          <% } %>
+        </div>
+
+        <!-- NAME + QTY -->
+        <div class="flex justify-between items-center px-7 py-3">
+
+          <h3 class="font-semibold text-sm"><%= item.name %></h3>
+
+          <div
+            class="flex items-center gap-1 quantity-control"
+            data-price="<%= item.price %>"
+            data-discount="<%= item.discount || 0 %>"
+          >
+            <button class="minus w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors">
+              <i class="ri-subtract-line text-sm"></i>
+            </button>
+
+            <div class="quantity px-2 py-1 text-sl rounded">
+              1
             </div>
 
-            <!-- NAME + QTY -->
-            <div class="flex justify-between items-center px-12 py-3 ">
-              <h3 class="font-semibold "><%= item.name %></h3>
-
-              <div class="flex items-center gap-1">
-                <button class="w-9 h-9 rounded-full flex items-center justify-center text-black hover:bg-gray-600 transition-colors bg-white">
-                  <i class="ri-subtract-line text-sm"></i>
-                </button>
-                <div class="px-2 py-1  rounded text-xxs shadow">01</div>
-                <button class="w-9 h-9 rounded-full flex items-center justify-center text-black hover:bg-gray-600 transition-colors bg-white">
-                  <i class="ri-add-line text-sm"></i>
-                </button>
-              </div>
-            </div>
-
-            <!-- PRICE -->
-            <div class="flex justify-between items-center px-12">
-              <span class="">Net Total</span>
-              <span class="font-semibold text-sm text-lg">₹ <%= item.price %></span>
-            </div>
-            <% if(item.discount > 0) { %>
-                        <p class="text-sm text-green-600 text-right px-12"><%= item.discount
-                            %>% OFF</p>
-                        <% } %>
-
+            <button class="plus w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors">
+              <i class="ri-add-line text-sm"></i>
+            </button>
           </div>
 
-        <% }) %>
+        </div>
+
+        <!-- PRICE -->
+        <div class="flex justify-between items-center px-7 pb-3 text-sm">
+          <span>Net Total</span>
+          <span class="font-semibold">₹ <%= item.price %></span>
+        </div>
+        <div class="flex flex-wrap gap-12">
+                <button onclick="removeProduct('<%= item._id %>')" class="px-8 mb-2 rounded text-sm hover:bg-red-600">
+                  Delete
+                </button>
+                <% if (item.discount > 0) { %>
+          <p class="text-sm text-green-600">
+            <%= item.discount %>% OFF
+          </p>
+        <% } %>
+              </div>
 
       </div>
+
+      <% }) %>
+
+    </div>
 
     <% } else { %>
 
-      <div class="w-full h-72 bg-secondary flex flex-col items-center justify-center rounded-lg">
-        <h3 class="text-xl font-semibold">Your cart is empty</h3>
-        <p class="mt-2 text-secondary">
-          Add some products to your cart to see them here
-        </p>
-      </div>
+    <div class="w-full min-h-screen  flex flex-col items-center justify-center rounded-lg bg-gray-600">
+      <h3 class="text-xl font-semibold">Your cart is empty</h3>
+      <p class="mt-2 text-gray-300">
+        Add some products to your cart to see them here
+      </p>
+    </div>
 
     <% } %>
 
   </div>
 
   <!-- PRICE BREAKDOWN -->
-  <div class="w-[20%] border-3 sticky top-28">
-    <div class=" shadow-md rounded-xl p-8">
+  <div class="w-[20%] sticky top-28">
+
+    <div class="shadow-md rounded-xl p-6 ">
 
       <h3 class="text-lg font-semibold mb-4">Price Breakdown</h3>
 
       <div class="space-y-3 text-sm">
+
         <div class="flex justify-between">
           <span>Total MRP</span>
-          <span>
-            ₹ <%= cartItems && cartItems.length > 0
-              ? cartItems.reduce((t, i) => t + i.price, 0)
-              : 0 %>
-          </span>
+          <span>₹ <span id="totalMrp">0</span></span>
         </div>
 
         <div class="flex justify-between">
           <span>Discount on MRP</span>
-          <span class="text-green-400">
-            - ₹ <%= cartItems && cartItems.length > 0
-              ? cartItems.reduce((d, i) => {
-                  const mrp = Number(i.price)
-                  const dis = Number(i.discount) || 0
-                  return d + (mrp * dis / 100)
-                }, 0)
-              : 0 %>
+          <span class="text-green-500">
+            - ₹ <span id="totalDiscount">0</span>
           </span>
         </div>
 
@@ -107,20 +115,17 @@
 
         <div class="flex justify-between">
           <span>Shipping Fee</span>
-          <span class="text-green-400">FREE</span>
+          <span class="text-green-500">FREE</span>
         </div>
+
       </div>
 
-      <div class="w-full h-[1px] bg-gray-300 my-6"></div>
+      <div class="w-full h-[1px] bg-gray-300 my-5"></div>
 
       <div class="flex justify-between items-center">
         <h3 class="text-lg font-semibold">Total Amount</h3>
         <h3 class="font-semibold text-lg text-green-600">
-          ₹ <%= cartItems && cartItems.length > 0
-            ? (cartItems.reduce((t, i) =>
-                t + Number(i.price) * (1 - (Number(i.discount) || 0) / 100),
-              0) + 20)
-            : 20 %>
+          ₹ <span id="totalAmount">20</span>
         </h3>
       </div>
 
@@ -146,3 +151,84 @@
 </div>
 
 <%- include('./partials/footer') %>
+
+<!-- ================= JS ================= -->
+<script>
+  const platformFee = 20;
+
+  const totalMrpEl = document.getElementById("totalMrp");
+  const totalDiscountEl = document.getElementById("totalDiscount");
+  const totalAmountEl = document.getElementById("totalAmount");
+
+  function updateTotals() {
+    let totalMrp = 0;
+    let totalDiscount = 0;
+
+    document.querySelectorAll(".quantity-control").forEach(control => {
+      const price = Number(control.dataset.price);
+      const discount = Number(control.dataset.discount);
+      const qty = Number(control.querySelector(".quantity").textContent);
+
+      const mrp = price * qty;
+      const dis = (mrp * discount) / 100;
+
+      totalMrp += mrp;
+      totalDiscount += dis;
+    });
+
+    totalMrpEl.textContent = totalMrp.toFixed(0);
+    totalDiscountEl.textContent = totalDiscount.toFixed(0);
+    totalAmountEl.textContent = (totalMrp - totalDiscount + platformFee).toFixed(0);
+  }
+
+  document.querySelectorAll(".quantity-control").forEach(control => {
+    const quantityEl = control.querySelector(".quantity");
+    const plusBtn = control.querySelector(".plus");
+    const minusBtn = control.querySelector(".minus");
+
+    let quantity = Number(quantityEl.textContent);
+
+    plusBtn.addEventListener("click", () => {
+      quantity++;
+      quantityEl.textContent = quantity;
+      updateTotals();
+    });
+
+    minusBtn.addEventListener("click", () => {
+      if (quantity > 0) {
+        quantity--;
+        quantityEl.textContent = quantity;
+        updateTotals();
+      }
+    });
+  });
+
+  updateTotals();
+</script>
+
+<script>
+  function removeProduct(productId) {
+  if(confirm('Are you sure you want to delete this product?')) {
+    fetch(`/users/delete/${productId}`, {
+      method: 'delete',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    
+    .then(res => res.json())
+    .then(data => {
+      if(data.success) {
+        alert('Product deleted successfully');
+        location.reload();
+      } else {
+        alert('Failed to delete product: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error deleting product');
+    });
+  }
+}
+</script>
