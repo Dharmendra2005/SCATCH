@@ -93,8 +93,7 @@ function addToCart(productId) {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      // optional UX feedback
-      console.log("yes product added to Cart")
+      // console.log("yes product added to Cart")
       req.flash("success", "Added to Cart");
     } else {
       req.flash("error", "Didnot added");
