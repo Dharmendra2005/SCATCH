@@ -10,7 +10,7 @@ const isOwnerLoggedIn = require("../middlewares/isOwnerLoggedIn");
 router.delete("/delete/all", async (req, res) => {
   try {
     await productModel.deleteMany({});
-    console.log("All products deleted");
+    // console.log("All products deleted");
     res.json({ success: true, message: "All products deleted" });
   } catch (error) {
     console.error("Delete all products error:", error);
@@ -23,7 +23,7 @@ router.delete("/delete/:productId", async (req, res) => {
   try {
     const productId = req.params.productId;
     await productModel.findByIdAndDelete(productId);
-    console.log("Product deleted:", productId);
+    // console.log("Product deleted:", productId);
     res.json({ success: true, message: "Product deleted" });
   } catch (error) {
     console.error("Delete product error:", error);
