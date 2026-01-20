@@ -4,7 +4,7 @@ SCATCH is a **full‑stack e‑commerce style web application** built to demonst
 
 ---
 
-## 📌 Project Summary (ATS‑Optimized)
+## 📌 Project Summary
 
 SCATCH enables users to securely register and authenticate, browse products, and interact with a dynamic shopping interface. The application integrates a Node.js and Express backend with server‑side rendering using EJS, styled via Tailwind CSS, and persistent data storage using MongoDB/MySQL. It showcases full‑stack development, clean code practices, and modular system design.
 
