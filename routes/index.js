@@ -54,8 +54,8 @@ router.get("/shop", isLoggedIn, async (req, res) => {
 
     let error = req.flash("error");
     let success = req.flash("success");
-    console.log("Products found:", products.length);
-    console.log("Filters applied:", { sortby, category, discount, available });
+    // console.log("Products found:", products.length);
+    // console.log("Filters applied:", { sortby, category, discount, available });
     res.render("shop", { products, loggedin: true, error, success });
   } catch (error) {
     console.error("Shop error:", error);
@@ -65,9 +65,9 @@ router.get("/shop", isLoggedIn, async (req, res) => {
 
 router.get("/cart", isLoggedIn, async (req, res) => {
   try {
-    console.log("Loading cart for user:", req.user._id);
+    // console.log("Loading cart for user:", req.user._id);
     const user = await userModel.findById(req.user._id).populate("cart");
-    console.log("User cart items:", user.cart);
+    // console.log("User cart items:", user.cart);
     const cartItems = user.cart || [];
     res.render("cart", { cartItems, loggedin: true });
   } catch (error) {
@@ -88,7 +88,7 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
     // Check if product exists
     const product = await productModel.findById(productId);
     if (!product) {
-      console.log("Product not found:", productId);
+      // console.log("Product not found:", productId);
       req.flash("error", "Product not found");
       return res.redirect("/shop");
     }
