@@ -110,7 +110,7 @@
 
         <div class="flex justify-between">
           <span>Platform Fee</span>
-          <span>₹ 20</span>
+          <span>₹ 35</span>
         </div>
 
         <div class="flex justify-between">
@@ -125,9 +125,23 @@
       <div class="flex justify-between items-center">
         <h3 class="text-lg font-semibold">Total Amount</h3>
         <h3 class="font-semibold text-lg text-green-600">
-          ₹ <span id="totalAmount">20</span>
+          ₹ <span id="totalAmount">35</span>
         </h3>
       </div>
+      <% if(cartItems && cartItems.length>0){ %>
+        <form action="users/payment" method="post">
+          <button type="submit"
+           class="mt-6 w-full px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
+            Place Order
+          </button>
+        </form>
+        <% } else { %>
+          <button disabled="disabled"
+          class="mt-6 w-full px-6 py-3 bg-gray-400 text-white rounded-full cursor-not-allowed">
+            Place Order
+          </button>
+
+        <% } %>
 
       <% if (cartItems && cartItems.length > 0) { %>
         <form action="/checkout" method="post">
@@ -154,7 +168,7 @@
 
 <!-- ================= JS ================= -->
 <script>
-  const platformFee = 20;
+  const platformFee = 35;
 
   const totalMrpEl = document.getElementById("totalMrp");
   const totalDiscountEl = document.getElementById("totalDiscount");
