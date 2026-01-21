@@ -34,4 +34,8 @@ router.delete("/delete/:id", isLoggedIn, async (req, res) => {
   }
 });
 
+router.post("/payment",isLoggedIn, (req, res) => {
+  res.render("placeOrder");
+});
+
 module.exports = router;
