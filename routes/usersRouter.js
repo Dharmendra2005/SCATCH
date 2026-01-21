@@ -34,8 +34,9 @@ router.delete("/delete/:id", isLoggedIn, async (req, res) => {
   }
 });
 
-router.post("/payment",isLoggedIn, (req, res) => {
-  res.render("placeOrder");
+router.post("/address",isLoggedIn, async (req, res) => {
+  const user = await userModel.findById(req.user._id).populate("cart");
+  res.render("placeOrder", {cartItems : user.cart});
 });
 
 module.exports = router;
