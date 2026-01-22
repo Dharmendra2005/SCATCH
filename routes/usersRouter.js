@@ -39,4 +39,7 @@ router.post("/address",isLoggedIn, async (req, res) => {
   res.render("placeOrder", {cartItems : user.cart});
 });
 
+router.get("/payment", isLoggedIn, (req, res) => {
+  res.render("finallyPlaceOrder");
+})
 module.exports = router;
