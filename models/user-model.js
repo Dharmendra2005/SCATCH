@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
   },
   contact: Number,
   picture: String,
+  Address: [{
+    type:String,
+    ref: 'address'
+  }]
 });
 
 module.exports = mongoose.models.user || mongoose.model("user", userSchema);
