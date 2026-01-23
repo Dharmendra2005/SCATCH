@@ -7,7 +7,8 @@
         <div class="rounded-xl p-6 mb-6 mt-6">
             <h4 class="text-2xl mb-5">Create your Address</h4>
 
-            <form autocomplete="off" action="/address/collectAddress" method="post">
+            <form autocomplete="off" action="/address/collectAddress"
+                method="post">
 
                 <!-- CONTACT DETAILS -->
                 <h2 class="mb-2">Contact Details</h2>
@@ -110,13 +111,65 @@
                     <input type="checkbox" name="defaultAddress">
                     Make this my default address
                 </div>
-
                 <input
                     type="submit"
                     value="Create My Address"
-                    class="px-6 py-3 rounded-full bg-blue-600 text-white hover:bg-blue-700" />
-
+                    class=" mb-4 px-6 py-3 rounded-full bg-blue-600 text-white hover:bg-blue-700" />
             </form>
+            <button
+                id="openAddressModal"
+                type="button"
+                class="px-6 py-3 rounded-full bg-blue-600 text-white">
+                Use My Default Address
+            </button>
+
+            <div
+                id="addressModal"
+                class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+
+                <div
+                    class="bg-white w-[600px] max-h-[80vh] rounded-xl p-6 overflow-y-auto">
+
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">Select Delivery
+                            Address</h2>
+                        <button id="closeModal" class="text-xl">&times;</button>
+                    </div>
+
+                    <% if (addresses && addresses.length > 0) { %>
+                    <% addresses.forEach(address => { %>
+                    <div
+                        class="border rounded-lg p-4 mb-4 hover:bg-gray-50 cursor-pointer">
+                        <div class="flex items-center gap-2">
+                            <input
+                                type="radio"
+                                name="selectedAddress"
+                                value="<%= address._id %>"
+                                <%= address.defaultAddress ? "checked" : " " %>
+                            />
+                            <strong><%= address.name %></strong>
+
+                            <span
+                                class="text-xs bg-green-100 text-green-700 px-2 rounded">
+                                <%= address.addressType.toUpperCase() %>
+                            </span>
+                        </div>
+
+                        <p class="mt-2">
+                            <%= address.House_no %>, <%= address.Address %>
+                        </p>
+
+                        <p>Pin: <%= address.PinCode %></p>
+                        <p>Mobile: <%= address.Mobile_no %></p>
+                    </div>
+                    <% }) %>
+                    <% } else { %>
+                    <p>No saved addresses</p>
+                    <% } %>
+
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -221,6 +274,17 @@
   const text = document.getElementById("btnText");
 
   btn.addEventListener("click", () => {
+
+    // 🔒 Block click if disabled (no address selected)
+    if (btn.disabled) return;
+
+    // 🔍 Check selected address
+    const selectedAddress = document.querySelector(
+      'input[name="selectedAddress"]:checked'
+    );
+
+    if (!selectedAddress) return;
+
     btn.disabled = true;
     text.innerText = "Processing...";
 
@@ -239,9 +303,42 @@
       }
     );
 
-    // navigate after animation
+    // 🚀 Navigate after animation (with address ID)
     setTimeout(() => {
-      window.location.href = "/users/payment";
+      window.location.href =
+        `/users/payment?addressId=${selectedAddress.value}`;
     }, 1000);
+  });
+</script>
+
+
+<!-- for Use my Default Address button -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+
+    const openBtn = document.getElementById("openAddressModal");
+    const modal = document.getElementById("addressModal");
+    const closeBtn = document.getElementById("closeModal");
+
+    if (!openBtn || !modal || !closeBtn) {
+      console.log("Modal elements missing");
+      return;
+    }
+
+    openBtn.addEventListener("click", () => {
+      modal.classList.remove("hidden");
+    });
+
+    closeBtn.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
+
+    // close on backdrop click
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.classList.add("hidden");
+      }
+    });
+
   });
 </script>
