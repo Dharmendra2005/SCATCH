@@ -8,6 +8,7 @@ const {
 } = require("../controllers/authController");
 
 const isLoggedIn = require("../middlewares/isLoggedIn");
+const addressModel = require("../models/address-model");
 
 // router.get("/", (req, res) => {
 //   res.send("hello Dharm U r doing good job till now !");
@@ -34,11 +35,6 @@ router.delete("/delete/:id", isLoggedIn, async (req, res) => {
   }
 });
 
-router.post("/address",isLoggedIn, async (req, res) => {
-  const user = await userModel.findById(req.user._id).populate("cart");
-  console.log(user.cart)
-  res.render("placeOrder", {cartItems : user.cart});
-});
 
 router.get("/payment", isLoggedIn, (req, res) => {
   res.render("finallyPlaceOrder");
