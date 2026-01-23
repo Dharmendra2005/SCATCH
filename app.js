@@ -12,6 +12,7 @@ const db = require("./config/mongoose-connection");
 const ownersRouter = require("./routes/ownersRouter");
 const usersRouter = require("./routes/usersRouter");
 const productsRouter = require("./routes/productsRouter");
+const addressRouter = require("./routes/addressRouter");
 const indexRouter = require("./routes/index");
 
 const expressSession = require("express-session");
@@ -40,6 +41,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/owners", ownersRouter);
 app.use("/users", usersRouter);
 app.use("/products", productsRouter);
+app.use("/address", addressRouter);
 app.use("/", indexRouter);
 
 app.listen(3000, () => {
