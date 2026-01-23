@@ -36,10 +36,12 @@ router.delete("/delete/:id", isLoggedIn, async (req, res) => {
 
 router.post("/address",isLoggedIn, async (req, res) => {
   const user = await userModel.findById(req.user._id).populate("cart");
+  console.log(user.cart)
   res.render("placeOrder", {cartItems : user.cart});
 });
 
 router.get("/payment", isLoggedIn, (req, res) => {
   res.render("finallyPlaceOrder");
 })
+
 module.exports = router;
