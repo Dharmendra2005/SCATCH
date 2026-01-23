@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
   contact: Number,
   picture: String,
   Address: [{
-    type:String,
+    type:mongoose.Schema.Types.ObjectId,
     ref: 'address'
   }]
 });
