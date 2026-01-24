@@ -18,6 +18,7 @@ SCATCH enables users to securely register and authenticate, browse products, and
 * Database‑driven user and product management
 * MVC‑based modular architecture
 * Responsive UI using Tailwind CSS
+* UPI via Stripe requires account verification
 
 ---
 
