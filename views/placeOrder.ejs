@@ -188,7 +188,7 @@
                     class="flex gap-4 items-center border-b last:border-b-0 pb-4">
 
                     <img
-                        src="<%= item.image %>"
+                        src="data:image/jpeg;base64,<%= item.image.toString('base64') %>"
                         alt="<%= item.name %>"
                         class="w-16 h-16 object-cover rounded-lg" />
 
@@ -217,7 +217,7 @@
             <div class="space-y-3 text-sm">
                 <div class="flex justify-between">
                     <span>Total MRP</span>
-                    <span>₹ <span id="totalMrp">0</span></span>
+                    <span>₹<span id="totalMrp">0</span></span>
                 </div>
 
                 <div class="flex justify-between">
@@ -341,4 +341,30 @@
     });
 
   });
+</script>
+
+<script>
+  const platformFee = 35;
+
+  const cartItems = JSON.parse(`<%- JSON.stringify(cartItems) %>`);
+
+  let totalMrp = 0;
+  let totalDiscount = 0;
+
+  cartItems.forEach(item => {
+    const price = Number(item.price);
+    const qty = Number(item.quantity || 1);
+    const discount = Number(item.discount || 0);
+
+    const mrp = price * qty;
+    const dis = (mrp * discount) / 100;
+
+    totalMrp += mrp;
+    totalDiscount += dis;
+  });
+
+  document.getElementById("totalMrp").textContent = totalMrp.toFixed(0);
+  document.getElementById("totalDiscount").textContent = totalDiscount.toFixed(0);
+  document.getElementById("totalAmount").textContent =
+    (totalMrp - totalDiscount + platformFee).toFixed(0);
 </script>
