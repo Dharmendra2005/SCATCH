@@ -36,8 +36,9 @@ router.delete("/delete/:id", isLoggedIn, async (req, res) => {
 });
 
 
-router.get("/payment", isLoggedIn, (req, res) => {
-  res.render("finallyPlaceOrder");
+router.get("/payment", isLoggedIn, async (req, res) => {
+  const user = await userModel.findById(req.user._id).populate('cart')
+  res.render("finallyPlaceOrder", {cartItems: user.cart});
 })
 
 module.exports = router;
