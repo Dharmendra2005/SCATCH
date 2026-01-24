@@ -5,7 +5,6 @@ const addressModel = require("../models/address-model");
 const isLoggedIn = require("../middlewares/isLoggedIn");
 
 router.post("/address", isLoggedIn, async (req, res) => {
-  console.log("hiii..")
   res.redirect("/address/placeorder");
 });
 
