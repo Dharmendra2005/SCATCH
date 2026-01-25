@@ -4,4 +4,6 @@ node_modules/
 react/
 /javaScripts
 
+.env
+
 ReadMe.md

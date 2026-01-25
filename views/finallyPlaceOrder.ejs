@@ -90,18 +90,6 @@
                     value="ONLINE" required>
                 Online Payment (Card / UPI)
             </label>
-            <label class="text-xl flex gap-3 items-center">
-                <input class="h-5 w-5" type="radio" name="paytype"
-                    value="ONLINE" required>
-                Net Banking
-            </label>
-            <label class="text-xl flex gap-3 items-center">
-                <input class="h-5 w-5" type="radio" name="paytype"
-                    value="ONLINE" required>
-                Wallet (Paytm / PhonePe / Amazon Pay)
-            </label>
-
-
             <button
                 id="payBtn"
                 class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-full">
@@ -153,7 +141,7 @@
 
     // 🔵 CASH ON DELIVERY
     if (selected.value === "COD") {
-      window.location.href = "/orders/place-cod";
+      window.location.href = "/COD/orders/place-cod";
       return;
     }
 
@@ -163,7 +151,7 @@
       payBtn.innerText = "Redirecting to payment...";
 
       try {
-        const res = await fetch("/create-checkout-session", {
+        const res = await fetch("/stripe/create-checkout-session", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

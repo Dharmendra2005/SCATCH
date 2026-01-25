@@ -49,7 +49,7 @@ router.post('/create-checkout-session', async (req, res) => {
         },
       ],
       mode: 'payment',
-      success_url: `${req.protocol}://${req.get('host')}/orders/success`,
+      success_url: `${req.protocol}://${req.get('host')}/stripe/orders-success`,
       cancel_url: `${req.protocol}://${req.get('host')}/orders/cancel`,
     });
 
@@ -60,6 +60,9 @@ router.post('/create-checkout-session', async (req, res) => {
   }
 });
 
+router.get("/orders-success", (req, res) => {
+    res.render("orderSuccess");   
+})
 
 
 router.get('/test', async (req, res) => {
