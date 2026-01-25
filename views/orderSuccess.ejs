@@ -1,5 +1,111 @@
 <%- include('./partials/header') %>
-<h1>Thank you for your order!</h1>
-<p>Your order has been placed successfully.</p>
-<a href="/">Go back to home</a>
+
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div id="successCard"
+    class="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md text-center scale-90 opacity-0">
+
+    <!-- CHECK ICON -->
+    <div class="flex justify-center mb-6">
+      <svg class="checkmark" viewBox="0 0 52 52">
+        <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+        <path class="checkmark-check" fill="none"
+          d="M14 27l7 7 17-17"/>
+      </svg>
+    </div>
+
+    <h1 class="text-2xl font-bold text-black mb-2">Order Placed!</h1>
+    <p class="text-gray-500 mb-6">
+      Your order has been placed successfully 🎉
+    </p>
+
+    <a href="/shop"
+      class="inline-block px-6 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition">
+      Continue Shopping
+    </a>
+  </div>
+</div>
+
 <%- include('./partials/footer') %>
+
+<style>
+/* CARD POP ANIMATION */
+#successCard.show {
+  transform: scale(1);
+  opacity: 1;
+  transition: all 0.6s ease-out;
+}
+
+/* CHECKMARK */
+.checkmark {
+  width: 80px;
+  height: 80px;
+  stroke: #22c55e;
+  stroke-width: 4;
+  stroke-miterlimit: 10;
+  animation: scaleCheck 0.4s ease-in-out 0.9s both;
+}
+
+.checkmark-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: strokeCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: strokeCheck 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
+
+@keyframes strokeCircle {
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes strokeCheck {
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes scaleCheck {
+  0%, 100% { transform: none; }
+  50% { transform: scale(1.1); }
+}
+</style>
+
+<script>
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      document.getElementById("successCard").classList.add("show");
+      launchConfetti();
+    }, 200);
+  });
+
+  function launchConfetti() {
+    for (let i = 0; i < 40; i++) {
+      const confetti = document.createElement("div");
+      confetti.className = "confetti";
+      document.body.appendChild(confetti);
+
+      confetti.style.left = Math.random() * 100 + "vw";
+      confetti.style.animationDuration = 2 + Math.random() * 2 + "s";
+
+      setTimeout(() => confetti.remove(), 3000);
+    }
+  }
+</script>
+
+<style>
+.confetti {
+  position: fixed;
+  top: -10px;
+  width: 8px;
+  height: 8px;
+  background-color: hsl(calc(360 * var(--i)), 80%, 60%);
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh) rotate(360deg);
+  }
+}
+</style>

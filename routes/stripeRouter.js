@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const stripeSecretKey = "sk_test_51St9Sj4T8w5oeAP6l9QtHWsYI6SDs5p54LDjBXIqLVlQF0osJdJ7hoVlGUc2tfHmmFKhCWlofMA8WJzU5GyTGSLd00id96UGh4";
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripe = require('stripe')(stripeSecretKey);
 
 if (!stripeSecretKey) {
@@ -59,11 +59,6 @@ router.post('/create-checkout-session', async (req, res) => {
     res.status(500).json({ error: "Stripe session creation failed" });
   }
 });
-
-router.get("/orders-success", (req, res) => {
-    res.render("orderSuccess");   
-})
-
 
 router.get('/test', async (req, res) => {
   try {

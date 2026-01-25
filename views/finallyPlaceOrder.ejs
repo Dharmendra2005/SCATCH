@@ -90,6 +90,12 @@
                     value="ONLINE" required>
                 Online Payment (Card / UPI)
             </label>
+            <p
+  id="codNotice"
+  class="hidden text-sm text-red-600 font-medium mt-2"
+>
+  ⚠️ ₹9 extra delivery fee applicable for Cash on Delivery
+</p>
             <button
                 id="payBtn"
                 class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-full">
@@ -129,6 +135,31 @@
 
 
 <script>
+  const COD_FEE = 9;
+
+  const totalAmountEl = document.getElementById("totalAmount");
+  const codNotice = document.getElementById("codNotice");
+  const paymentRadios = document.querySelectorAll('input[name="paytype"]');
+
+  let baseTotal = Number(totalAmountEl.textContent);
+
+  paymentRadios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      if (radio.value === "COD" && radio.checked) {
+        codNotice.classList.remove("hidden");
+        totalAmountEl.textContent = baseTotal + COD_FEE;
+      }
+
+      if (radio.value === "ONLINE" && radio.checked) {
+        codNotice.classList.add("hidden");
+        totalAmountEl.textContent = baseTotal;
+      }
+    });
+  });
+</script>
+
+
+<script>
   const payBtn = document.getElementById("payBtn");
 
   payBtn.addEventListener("click", async () => {
@@ -141,9 +172,11 @@
 
     // 🔵 CASH ON DELIVERY
     if (selected.value === "COD") {
-      window.location.href = "/COD/orders/place-cod";
-      return;
-    }
+  alert("₹9 delivery fee has been added for Cash on Delivery");
+  window.location.href = "/COD/orders-place-cod";
+  return;
+}
+
 
     // 🔵 ONLINE PAYMENT → STRIPE
     if (selected.value === "ONLINE") {
@@ -152,7 +185,7 @@
 
       try {
         const res = await fetch("/stripe/create-checkout-session", {
-          method: "POST",
+          method: "post",
           headers: {
             "Content-Type": "application/json"
           }
