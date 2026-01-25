@@ -5,7 +5,7 @@ const app = express();
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const flash = require("express-flash");
-const session = require('express-session');
+const session = require("express-session");
 const db = require("./config/mongoose-connection");
 const ownersRouter = require("./routes/ownersRouter");
 const usersRouter = require("./routes/usersRouter");
@@ -45,7 +45,6 @@ app.use("/address", addressRouter);
 app.use("/COD", CODRouter);
 app.use("/stripe", stripeRouter);
 app.use("/", indexRouter);
-
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");

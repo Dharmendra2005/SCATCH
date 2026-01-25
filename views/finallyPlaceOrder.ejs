@@ -91,11 +91,10 @@
                 Online Payment (Card / UPI)
             </label>
             <p
-  id="codNotice"
-  class="hidden text-sm text-red-600 font-medium mt-2"
->
-  ⚠️ ₹9 extra delivery fee applicable for Cash on Delivery
-</p>
+                id="codNotice"
+                class="hidden text-sm text-red-600 font-medium mt-2">
+                ⚠️ ₹9 extra delivery fee applicable for Cash on Delivery
+            </p>
             <button
                 id="payBtn"
                 class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-full">
@@ -133,8 +132,8 @@
     (totalMrp - totalDiscount + platformFee).toFixed(0);
 </script>
 
-
 <script>
+<<<<<<< HEAD
   const COD_FEE = 9;
 
   const totalAmountEl = document.getElementById("totalAmount");
@@ -158,7 +157,6 @@
   });
 </script>
 
-
 <script>
   const payBtn = document.getElementById("payBtn");
 
@@ -172,11 +170,10 @@
 
     // 🔵 CASH ON DELIVERY
     if (selected.value === "COD") {
-  alert("₹9 delivery fee has been added for Cash on Delivery");
-  window.location.href = "/COD/orders-place-cod";
-  return;
-}
-
+      alert("₹9 delivery fee has been added for Cash on Delivery");
+      window.location.href = "/COD/orders-place-cod";
+      return;
+    }
 
     // 🔵 ONLINE PAYMENT → STRIPE
     if (selected.value === "ONLINE") {
@@ -185,7 +182,7 @@
 
       try {
         const res = await fetch("/stripe/create-checkout-session", {
-          method: "post",
+          method: "POST",
           headers: {
             "Content-Type": "application/json"
           }
