@@ -60,6 +60,46 @@
     document.addEventListener('DOMContentLoaded', applyThemeClasses);
 </script>
 
+<!-- Profile Panel -->
+<% if (loggedin && user) { %>
+<div
+    id="profilePanel"
+    class="fixed top-0 right-0 hidden h-full w-80 bg-white  text-black shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+    <div class="p-5 flex justify-between items-center border-b">
+        <h2 class="text-lg font-semibold">My Profile</h2>
+        <button id="closeProfile" class="text-xl cursor-pointer">✕</button>
+    </div>
+    
+    <!-- User Info Section -->
+    <div class="p-5 border-b">
+        <div class="flex items-center gap-3">
+            <% if (user.picture) { %>
+                <img src="<%= user.picture %>" alt="Profile" class="w-12 h-12 rounded-full object-cover">
+            <% } else { %>
+                <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white text-xl font-semibold">
+                    <%= user.fullname ? user.fullname.charAt(0).toUpperCase() : 'U' %>
+                </div>
+            <% } %>
+            <div>
+                <p class="font-semibold"><%= user.fullname || user.username || 'User' %></p>
+                <p class="text-sm text-gray-500"><%= user.email %></p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="p-5 space-y-4">
+        <a href="/profile" class="block hover:text-blue-500"><i class="ri-user-line mr-2"></i>My Account</a>
+        <a href="/orders" class="block hover:text-blue-500"><i class="ri-shopping-bag-line mr-2"></i>My Orders</a>
+        <a href="/cart" class="block hover:text-blue-500"><i class="ri-shopping-cart-line mr-2"></i>My Cart</a>
+        <a href="#" class="block hover:text-blue-500"><i class="ri-map-pin-line mr-2"></i>Saved Address</a>
+        <a href="#" class="block hover:text-blue-500"><i class="ri-mail-line mr-2"></i>Contact Us</a>
+        <a href="#" class="block hover:text-blue-500"><i class="ri-image-edit-line mr-2"></i>Edit My Profile</a>
+        <hr class="my-2">
+        <a href="/logout" class="block text-red-500 hover:text-red-600"><i class="ri-logout-box-line mr-2"></i>Logout</a>
+    </div>
+</div>
+<% } %>
+
 <!-- Profile Panel Script -->
 <script src="/javascripts/profilePanel.js"></script>
 
