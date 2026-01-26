@@ -116,6 +116,16 @@
     <a href="/logout" class="hover:text-blue-500">Logout</a>
   <% } %>
 
+  <!-- user profile pic and theme toggle -->
+    <% if (loggedin) { %>
+  <button
+    id="openProfileBtn"
+    class="hover:text-blue-500">
+    Profile
+  </button>
+<% } %>
+
+
   <!-- Theme Toggle -->
   <button
     id="theme-toggle"
