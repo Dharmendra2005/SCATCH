@@ -19,7 +19,7 @@ router.get("/items", async (req, res) => {
 
 router.post("/made", upload.single("image"), checkDuplicateImage,  async (req, res) => {
   try {
-    let { name, price, discount, bgcolor, panelcolor, textcolor } = req.body;
+    let { name, price, discount, bgcolor, panelcolor, textcolor, quantity} = req.body;
     let image = req.file;
 
     let item = await productModel.create({
@@ -30,6 +30,7 @@ router.post("/made", upload.single("image"), checkDuplicateImage,  async (req, r
       panelcolor,
       textcolor,
       image: image ? image.buffer : null,
+      quantity,
     });
     //how can we show that product on top
     req.flash("success", "Product created successfully!");
