@@ -124,7 +124,7 @@ router.post("/checkout", isLoggedIn, async (req, res) => {
     // Create order
     const order = {
       items: user.cart,
-      total: user.cart.reduce((total, item) => total + item.price, 0) + 20,
+      total: user.cart.reduce((total, item) => total + item.price, 0) + 35,
       date: new Date(),
     };
 
