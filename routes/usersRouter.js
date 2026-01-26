@@ -41,4 +41,22 @@ router.get("/payment", isLoggedIn, async (req, res) => {
   res.render("finallyPlaceOrder", {cartItems: user.cart});
 })
 
+router.post("/cart/update", isLoggedIn, async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+    const userId = req.user._id;
+
+    await userModel.updateOne(
+      { _id: userId, "cart._id": productId },
+      { $set: { "cart.$.quantity": quantity } }
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+});
+
+
 module.exports = router;
