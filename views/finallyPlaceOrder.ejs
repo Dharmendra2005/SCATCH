@@ -1,108 +1,114 @@
 <%- include('./partials/header') %>
 <div class="py-16 flex shadow px-20 gap-6">
-    <!-- LEFT SIDE -->
-    <div class="w-[40%] px-10 ">
+  <!-- LEFT SIDE -->
+  <div class="w-[40%] px-10 ">
 
-        <!-- DELIVERY ESTIMATES -->
-        <div class="shadow-md rounded-xl p-6 mb-6 mt-6">
-            <h3 class="text-lg font-semibold mb-4">Delivery Estimates</h3>
+    <!-- DELIVERY ESTIMATES -->
+    <div class="shadow-md rounded-xl p-6 mb-6 mt-6">
+      <h3 class="text-lg font-semibold mb-4">Delivery Estimates</h3>
 
-            <!-- SCROLLABLE CONTAINER -->
-            <div class="space-y-4 max-h-[290px] overflow-y-auto pr-2">
+      <!-- SCROLLABLE CONTAINER -->
+      <div class="space-y-4 max-h-[290px] overflow-y-auto pr-2">
 
-                <% cartItems.forEach(item => { %>
-                <div
-                    class="flex gap-4 items-center border-b last:border-b-0 pb-4">
+        <% cartItems.forEach(item => { %>
+        <div
+          class="flex gap-4 items-center border-b last:border-b-0 pb-4">
 
-                    <img
-                        src="data:image/jpeg;base64,<%= item.image.toString('base64') %>"
-                        alt="<%= item.name %>"
-                        class="w-16 h-16 object-cover rounded-lg" />
+          <img
+            src="data:image/jpeg;base64,<%= item.image.toString('base64') %>"
+            alt="<%= item.name %>"
+            class="w-16 h-16 object-cover rounded-lg" />
 
-                    <div class="flex-1">
-                        <p class="font-medium text-sm"><%= item.name %></p>
-                        <p class="text-xs text-gray-400">
-                            Estimated delivery by <b>27 Jan 2026</b>
-                        </p>
-                    </div>
-
-                    <p class="text-green-600 font-semibold text-sm">
-                        ₹<%= item.price %>
-                    </p>
-
-                </div>
-                <% }) %>
-
-            </div>
-        </div>
-
-        <!-- PRICE BREAKDOWN -->
-        <div class="shadow-lg rounded-xl p-6 sticky top-28">
-
-            <h3 class="text-lg font-semibold mb-4">Price Breakdown</h3>
-
-            <div class="space-y-3 text-sm">
-                <div class="flex justify-between">
-                    <span>Total MRP</span>
-                    <span>₹<span id="totalMrp">0</span></span>
-                </div>
-
-                <div class="flex justify-between">
-                    <span>Discount on MRP</span>
-                    <span class="text-green-600">
-                        - ₹ <span id="totalDiscount">0</span>
-                    </span>
-                </div>
-
-                <div class="flex justify-between">
-                    <span>Platform Fee</span>
-                    <span>₹ 35</span>
-                </div>
-
-                <div class="flex justify-between">
-                    <span>Shipping Fee</span>
-                    <span class="text-green-600">FREE</span>
-                </div>
-            </div>
-
-            <div class="h-px bg-gray-300 my-5"></div>
-
-            <div class="flex justify-between items-center mb-4">
-                <span class="font-semibold text-lg">Total Amount</span>
-                <span class="font-semibold text-lg text-green-600">
-                    ₹ <span id="totalAmount">35</span>
-                </span>
-            </div>
-        </div>
-    </div>
-    <!-- RIGHT SIDE -->
-    <div class="w-[60%]">
-        <h1 class="text-3xl mt-8">Payment Method</h1>
-        <div class="flex flex-col gap-4 mt-6 shadow-lg p-6 rounded-xl">
-            <label class="text-xl flex gap-3 items-center">
-                <input class="h-5 w-5" type="radio" name="paytype" value="COD"
-                    required>
-                Cash On Delivery
-            </label>
-
-            <label class="text-xl flex gap-3 items-center">
-                <input class="h-5 w-5" type="radio" name="paytype"
-                    value="ONLINE" required>
-                Online Payment (Card / UPI)
-            </label>
-            <p
-                id="codNotice"
-                class="hidden text-sm text-red-600 font-medium mt-2">
-                ⚠️ ₹9 extra delivery fee applicable for Cash on Delivery
+          <div class="flex-1">
+            <p class="font-medium text-sm"><%= item.name %></p>
+            <p class="text-xs text-gray-400">
+              Estimated delivery by <b>27 Jan 2026</b>
             </p>
-            <button
-                id="payBtn"
-                class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-full">
-                Pay Now
-            </button>
+          </div>
+
+          <p class="text-green-600 font-semibold text-sm">
+            ₹<%= item.price %>
+          </p>
+
+        </div>
+        <% }) %>
+
+      </div>
+    </div>
+
+    <!-- PRICE BREAKDOWN -->
+    <div class="shadow-lg rounded-xl p-6 sticky top-28">
+
+      <h3 class="text-lg font-semibold mb-4">Price Breakdown</h3>
+
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between">
+          <span>Total MRP</span>
+          <span>₹<span id="totalMrp">0</span></span>
         </div>
 
+        <div class="flex justify-between">
+          <span>Discount on MRP</span>
+          <span class="text-green-600">
+            - ₹ <span id="totalDiscount">0</span>
+          </span>
+        </div>
+
+        <div class="flex justify-between">
+          <span>Platform Fee</span>
+          <span>₹ 35</span>
+        </div>
+
+        <div class="flex justify-between">
+          <span>Shipping Fee</span>
+          <span class="text-green-600">FREE</span>
+        </div>
+      </div>
+
+      <div class="h-px bg-gray-300 my-5"></div>
+
+      <div class="flex justify-between items-center mb-4">
+        <span class="font-semibold text-lg">Total Amount</span>
+        <span class="font-semibold text-lg text-green-600">
+          ₹ <span id="totalAmount">35</span>
+        </span>
+      </div>
     </div>
+  </div>
+  <!-- RIGHT SIDE -->
+  <div class="w-[60%]">
+    <h1 class="text-3xl mt-8">Payment Method</h1>
+    <div class="flex flex-col gap-4 mt-6 shadow-lg p-6 rounded-xl">
+      <label class="text-xl flex gap-3 items-center">
+        <input class="h-5 w-5" type="radio" name="paytype" value="COD"
+          required>
+        Cash On Delivery
+      </label>
+
+      <label class="text-xl flex gap-3 items-center">
+        <input class="h-5 w-5" type="radio" name="paytype"
+          value="ONLINE" required>
+        Online Payment (Card / UPI)
+      </label>
+      <p
+        id="codNotice"
+        class="hidden text-sm text-red-600 font-medium mt-2">
+        ⚠️ ₹9 extra delivery fee applicable for Cash on Delivery
+      </p>
+      <button
+        id="payBtn"
+        class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-full">
+        Pay Now
+      </button>
+      <p
+        id="codBelowPayBtn"
+        class="hidden mt-12 text-xl font-semibold text-center ">
+        Total Payable on Delivery: ₹<span id="codBelowAmount"></span>
+      </p>
+
+    </div>
+
+  </div>
 </div>
 <%- include('./partials/footer') %>
 
@@ -132,30 +138,43 @@
     (totalMrp - totalDiscount + platformFee).toFixed(0);
 </script>
 
-<script>
-<<<<<<< HEAD
-  const COD_FEE = 9;
 
+<script>
+  const COD_FEE = 9;
   const totalAmountEl = document.getElementById("totalAmount");
   const codNotice = document.getElementById("codNotice");
+  const codBelowPayBtn = document.getElementById("codBelowPayBtn");
+  const codBelowAmount = document.getElementById("codBelowAmount");
   const paymentRadios = document.querySelectorAll('input[name="paytype"]');
 
+  // Keep track of the original total (without COD)
   let baseTotal = Number(totalAmountEl.textContent);
 
   paymentRadios.forEach(radio => {
     radio.addEventListener("change", () => {
+
       if (radio.value === "COD" && radio.checked) {
         codNotice.classList.remove("hidden");
-        totalAmountEl.textContent = baseTotal + COD_FEE;
+
+        const codTotal = baseTotal + COD_FEE;
+        totalAmountEl.textContent = codTotal.toFixed(0);
+
+        codBelowAmount.textContent = codTotal.toFixed(0);
+        codBelowPayBtn.classList.remove("hidden");
       }
 
       if (radio.value === "ONLINE" && radio.checked) {
         codNotice.classList.add("hidden");
-        totalAmountEl.textContent = baseTotal;
+
+        totalAmountEl.textContent = baseTotal.toFixed(0);
+
+        codBelowPayBtn.classList.add("hidden");
       }
     });
   });
 </script>
+
+
 
 <script>
   const payBtn = document.getElementById("payBtn");
@@ -170,10 +189,11 @@
 
     // 🔵 CASH ON DELIVERY
     if (selected.value === "COD") {
-      alert("₹9 delivery fee has been added for Cash on Delivery");
-      window.location.href = "/COD/orders-place-cod";
-      return;
-    }
+  alert("₹9 delivery fee has been added for Cash on Delivery");
+  window.location.href = "/COD/orders-place-cod";
+  return;
+}
+
 
     // 🔵 ONLINE PAYMENT → STRIPE
     if (selected.value === "ONLINE") {
@@ -182,7 +202,7 @@
 
       try {
         const res = await fetch("/stripe/create-checkout-session", {
-          method: "POST",
+          method: "post",
           headers: {
             "Content-Type": "application/json"
           }
