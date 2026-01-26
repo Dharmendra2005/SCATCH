@@ -11,6 +11,7 @@ const productSchema = mongoose.Schema({
     bgcolor: String,
     panelcolor: String,
     textcolor: String,
+    quantity: Number
 });
 
 module.exports = mongoose.models.product || mongoose.model("product", productSchema);
