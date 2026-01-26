@@ -104,24 +104,22 @@
     <a href="/cart" class="hover:text-blue-500">Cart</a>
   <% } %>
 
-  <!-- Admin Access: always visible -->
-  <% if (ownerLoggedIn) { %>
-    <a href="/owners/admin" class="hover:text-blue-500">Admin Access</a>
-  <% } else { %>
-    <a href="/create" class="hover:text-blue-500">Admin Access</a>
-  <% } %>
-
   <!-- Logout: user OR owner -->
   <% if (loggedin || ownerLoggedIn) { %>
     <a href="/logout" class="hover:text-blue-500">Logout</a>
+  <% } %>
+   <!-- Admin Access: always visible -->
+  <% if (ownerLoggedIn) { %>
+    <a href="/owners/admin" class="ri-admin-line text-2xl hover:text-blue-500"></a>
+  <% } else { %>
+    <a href="/create" class="ri-admin-line text-2xl hover:text-blue-500"></a>
   <% } %>
 
   <!-- user profile pic and theme toggle -->
     <% if (loggedin) { %>
   <button
     id="openProfileBtn"
-    class="hover:text-blue-500">
-    Profile
+    class="ri-account-pin-circle-line text-3xl hover:text-blue-500">
   </button>
 <% } %>
 
