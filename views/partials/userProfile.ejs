@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <link rel="icon" type="image/png" href="/images/cart.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SCATCH</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
+            rel="stylesheet" />
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+
+    <body>
+        <!-- PROFILE ICON -->
+        <!-- RIGHT SIDE PANEL -->
+        <div
+            id="profilePanel"
+            class="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl
+         transform translate-x-full transition-transform duration-300 z-50">
+
+            <div class="p-5 flex justify-between items-center border-b">
+                <h2 class="text-lg font-semibold">My Profile</h2>
+                <button id="closeProfile" class="text-xl">✕</button>
+            </div>
+
+            <div class="p-5 space-y-4">
+                <a href="/profile" class="block">My Account</a>
+                <a href="/orders" class="block">My Orders</a>
+                <a href="/logout" class="block text-red-500">Logout</a>
+            </div>
+        </div>
+
+        <script src="../public/javascripts/profilePanel.js"></script>
+    </body>
+</html>
