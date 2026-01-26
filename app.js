@@ -14,13 +14,34 @@ const addressRouter = require("./routes/addressRouter");
 const CODRouter = require("./routes/CODRouter");
 const stripeRouter = require("./routes/stripeRouter");
 const indexRouter = require("./routes/index");
+const jwt = require("jsonwebtoken");
+const userModel = require("./models/user-model");
 
 const expressSession = require("express-session");
 
 app.use(cookieParser());
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   res.locals.loggedin = !!req.cookies.token;
   res.locals.ownerLoggedIn = !!req.cookies.owner;
+  res.locals.user = null;
+
+  // Fetch user data if logged in
+  if (req.cookies.token) {
+    try {
+      const decoded = jwt.verify(
+        req.cookies.token,
+        process.env.JWT_KEY || "shhhhhhhhhhhhhh",
+      );
+      const user = await userModel
+        .findOne({ email: decoded.email })
+        .select("-password");
+      res.locals.user = user;
+    } catch (err) {
+      // Token invalid, clear it
+      res.clearCookie("token");
+      res.locals.loggedin = false;
+    }
+  }
   next();
 });
 app.use(
