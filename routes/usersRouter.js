@@ -58,5 +58,13 @@ router.post("/cart/update", isLoggedIn, async (req, res) => {
   }
 });
 
+router.get("/profile", isLoggedIn, async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user._id);
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
 
 module.exports = router;
