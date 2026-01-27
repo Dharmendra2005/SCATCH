@@ -1,7 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 const isLoggedIn = require("../middlewares/isLoggedIn");
 const isOwnerLoggedIn = require("../middlewares/isOwnerLoggedIn");
 const productModel = require("../models/product-model");
@@ -66,9 +66,25 @@ router.get("/shop", isLoggedIn, async (req, res) => {
 router.get("/cart", isLoggedIn, async (req, res) => {
   try {
     // console.log("Loading cart for user:", req.user._id);
-    const user = await userModel.findById(req.user._id).populate("cart");
+    const user = await userModel
+      .findById(req.user._id)
+      .populate("cart.product");
     // console.log("User cart items:", user.cart);
-    const cartItems = user.cart || [];
+
+    // Transform cart items to include product details with quantity
+    const cartItems =
+      user.cart.map((item) => ({
+        _id: item.product._id,
+        name: item.product.name,
+        price: item.product.price,
+        discount: item.product.discount,
+        image: item.product.image,
+        bgcolor: item.product.bgcolor,
+        panelcolor: item.product.panelcolor,
+        textcolor: item.product.textcolor,
+        quantity: item.quantity,
+      })) || [];
+
     res.render("cart", { cartItems, loggedin: true });
   } catch (error) {
     console.error("Cart error:", error);
@@ -76,7 +92,6 @@ router.get("/cart", isLoggedIn, async (req, res) => {
     res.redirect("/shop");
   }
 });
-
 
 router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
   try {
@@ -95,7 +110,11 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
 
     // Check if product already in cart
     const user = await userModel.findById(userId);
-    if (user.cart.includes(productId)) {
+    const existingCartItem = user.cart.find(
+      (item) => item.product.toString() === productId,
+    );
+
+    if (existingCartItem) {
       // console.log("Product already in cart");
       req.flash("error", "Product already in cart");
       return res.redirect("/shop");
@@ -103,7 +122,7 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
 
     // Add product to user's cart
     await userModel.findByIdAndUpdate(userId, {
-      $push: { cart: productId },
+      $push: { cart: { product: productId, quantity: 1 } },
     });
 
     req.flash("success", "Product added to cart");
@@ -115,16 +134,30 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
   }
 });
 
-
-
 router.post("/checkout", isLoggedIn, async (req, res) => {
   try {
-    const user = await userModel.findById(req.user._id).populate("cart");
+    const user = await userModel
+      .findById(req.user._id)
+      .populate("cart.product");
+
+    // Transform cart items and calculate total
+    const orderItems = user.cart.map((item) => ({
+      product: item.product,
+      quantity: item.quantity,
+      priceAtTime: item.product.price,
+      discountAtTime: item.product.discount || 0,
+    }));
+
+    const subtotal = orderItems.reduce((total, item) => {
+      const itemTotal = item.priceAtTime * item.quantity;
+      const discount = (itemTotal * item.discountAtTime) / 100;
+      return total + (itemTotal - discount);
+    }, 0);
 
     // Create order
     const order = {
-      items: user.cart,
-      total: user.cart.reduce((total, item) => total + item.price, 0) + 35,
+      items: orderItems,
+      total: subtotal + 35, // Adding platform fee
       date: new Date(),
     };
 
@@ -137,6 +170,7 @@ router.post("/checkout", isLoggedIn, async (req, res) => {
     req.flash("success", "Order placed successfully!");
     res.redirect("/shop");
   } catch (error) {
+    console.error("Checkout error:", error);
     req.flash("error", "Failed to place order");
     res.redirect("/cart");
   }
@@ -147,8 +181,7 @@ router.get("/create", (req, res) => {
   res.render("owner-login");
 });
 
-
-// Create Owner ONLY via Postman 
+// Create Owner ONLY via Postman
 // router.post("/create", async (req, res) => {
 //   try {
 //     const { username, email, password } = req.body;
@@ -205,14 +238,11 @@ router.post("/create", async (req, res) => {
       products: owner.products || [],
       success: "Welcome, " + owner.username,
     });
-
   } catch (err) {
     console.error(err);
     res.send("Something went wrong");
-    
   }
 });
-
 
 router.get("/logout", (req, res) => {
   console.log("User logging out");
