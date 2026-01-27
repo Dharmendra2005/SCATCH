@@ -8,14 +8,28 @@ router.post("/address", isLoggedIn, async (req, res) => {
   res.redirect("/address/placeorder");
 });
 
-
 router.get("/placeorder", isLoggedIn, async (req, res) => {
   const addresses = await addressModel
     .find({ user: req.user._id })
     .sort({ defaultAddress: -1, createdAt: 1 });
-  const user = await userModel.findById(req.user._id).populate("cart");
+  const user = await userModel.findById(req.user._id).populate("cart.product");
+
+  // Transform cart items to include product details with quantity
+  const cartItems =
+    user.cart.map((item) => ({
+      _id: item.product._id,
+      name: item.product.name,
+      price: item.product.price,
+      discount: item.product.discount,
+      image: item.product.image,
+      bgcolor: item.product.bgcolor,
+      panelcolor: item.product.panelcolor,
+      textcolor: item.product.textcolor,
+      quantity: item.quantity,
+    })) || [];
+
   // console.log(user, addresses);
-  res.render("placeOrder", { cartItems: user.cart, addresses });
+  res.render("placeOrder", { cartItems, addresses });
 });
 
 router.post("/collectAddress", isLoggedIn, async (req, res) => {
