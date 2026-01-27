@@ -6,6 +6,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const flash = require("express-flash");
 const session = require("express-session");
+const compression = require("compression");
 const db = require("./config/mongoose-connection");
 const ownersRouter = require("./routes/ownersRouter");
 const usersRouter = require("./routes/usersRouter");
@@ -19,7 +20,15 @@ const userModel = require("./models/user-model");
 
 const expressSession = require("express-session");
 
+// Enable compression for better performance
+app.use(compression());
+
 app.use(cookieParser());
+
+// Cache user data to avoid repeated database calls
+const userCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 app.use(async (req, res, next) => {
   res.locals.loggedin = !!req.cookies.token;
   res.locals.ownerLoggedIn = !!req.cookies.owner;
@@ -32,11 +41,30 @@ app.use(async (req, res, next) => {
         req.cookies.token,
         process.env.JWT_KEY || "shhhhhhhhhhhhhh",
       );
-      const user = await userModel
-        .findOne({ email: decoded.email })
-        .select("-password");
-      res.locals.user = user;
+
+      // Check cache first
+      const cacheKey = `user_${decoded.email}`;
+      const cachedUser = userCache.get(cacheKey);
+
+      if (cachedUser && Date.now() - cachedUser.timestamp < CACHE_TTL) {
+        res.locals.user = cachedUser.data;
+      } else {
+        const user = await userModel
+          .findOne({ email: decoded.email })
+          .select("-password")
+          .lean(); // Use lean() for better performance
+
+        if (user) {
+          // Cache the user data
+          userCache.set(cacheKey, {
+            data: user,
+            timestamp: Date.now(),
+          });
+          res.locals.user = user;
+        }
+      }
     } catch (err) {
+      console.error("Auth middleware error:", err);
       // Token invalid, clear it
       res.clearCookie("token");
       res.locals.loggedin = false;
