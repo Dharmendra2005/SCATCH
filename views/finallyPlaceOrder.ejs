@@ -188,7 +188,8 @@
     }
 
     // 🔵 CASH ON DELIVERY
-    if (selected.value === "COD") {
+   
+    if (selected.value === "COD" && cartItems.length > 0) {
   alert("₹9 delivery fee has been added for Cash on Delivery");
   window.location.href = "/COD/orders-place-cod";
   return;
