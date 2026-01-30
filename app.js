@@ -17,6 +17,7 @@ const stripeRouter = require("./routes/stripeRouter");
 const indexRouter = require("./routes/index");
 const jwt = require("jsonwebtoken");
 const userModel = require("./models/user-model");
+const upiRouter = require("./routes/upiRouter");
 
 const expressSession = require("express-session");
 
@@ -93,6 +94,7 @@ app.use("/products", productsRouter);
 app.use("/address", addressRouter);
 app.use("/COD", CODRouter);
 app.use("/stripe", stripeRouter);
+app.use("/upi", upiRouter);
 app.use("/", indexRouter);
 
 app.listen(3000, () => {
