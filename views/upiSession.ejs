@@ -36,11 +36,31 @@
             </div>
         </div>
         <div>
-             <h1 class="text-lg font-semibold mb-4 px-8">Address</h1>
-             <div class="w-40 h-20 px-8 ">
-                <p class="text-md font-medium">123, Sample Street</p>
-                <p class="text-sm text-gray-500">City, State - 123456</p>
-             </div>
+            <h1 class="text-lg font-semibold mb-4 px-8">Address</h1>
+            <div class="border rounded-lg p-4 mb-4">
+
+                <div class="flex items-center gap-2">
+                    <input type="radio" name="selectedAddress" checked />
+                    <strong><%= address.name %></strong>
+
+                    <span
+                        class="text-xs bg-green-100 text-green-700 px-2 rounded">
+                        <%= address.addressType.toUpperCase() %>
+                    </span>
+                </div>
+
+                <p class="mt-2">
+                    <%= address.House_no %>, <%= address.Address %>
+                </p>
+
+                <p>
+                    Pin: <%= address.PinCode %>
+                </p>
+
+                <p>
+                    Mobile: <%= address.Mobile_no %>
+                </p>
+            </div>
         </div>
     </div>
 
