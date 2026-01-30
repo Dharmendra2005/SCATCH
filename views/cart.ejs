@@ -44,7 +44,7 @@
               <%= item.quantity || 1 %>
             </div>
 
-            <button
+            <button id="Goto"
               class="plus w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-600">
               <i class="ri-add-line"></i>
             </button>
@@ -147,6 +147,14 @@
 <%- include('./partials/footer') %>
 
 <!-- ================= JS ================= -->
+
+<script>
+  let btn = document.getElementById("Goto");
+  btn.addEventListener("click", function(event) {
+   event.preventDefault();
+  });
+
+</script>
 <script>
   const platformFee = 35;
 
