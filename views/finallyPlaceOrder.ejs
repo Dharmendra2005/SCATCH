@@ -174,7 +174,7 @@
 
         codBelowPayBtn.classList.add("hidden");
       }
-      if (radio.upi === "upi" && radio.checked){
+      if (radio.value === "upi" && radio.checked){
         codNotice.classList.add("hidden");
 
         totalAmountEl.textContent = baseTotal.toFixed(0);
@@ -235,32 +235,20 @@
         payBtn.innerText = "Pay Now";
       }
     }
+    // 🔵
     if(selected.value === "upi"){
       payBtn.disabled = true;
       payBtn.innerText = "Redirecting to payment...";
-
       try{
-        const res = await fetch("/upi/create-upi-session", {
-          method: "post",
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
-        const data = await res.json();
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          alert("Payment failed. Try again.");
-          payBtn.disabled = false;
-          payBtn.innerText = "Pay Now";
-        }
-            }
-            catch (err) {
-              console.error(err);
-              alert("Something went wrong");
-              payBtn.disabled = false;
-              payBtn.innerText = "Pay Now";
-            }
+        setTimeout(() => {
+        window.location.href = "/upi/create-upi-session";
+      }, 2000);
+      }catch (err) {
+        console.error(err);
+        alert("Something went wrong");
+        payBtn.disabled = false;
+        payBtn.innerText = "Pay Now";
+      }
     }
   });
 </script>
