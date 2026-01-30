@@ -97,12 +97,33 @@ function addToCart(productId) {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      // console.log("yes product added to Cart")
-      req.flash("success", "Added to Cart");
+      // Use browser alert or a toast notification
+      showToast("Added to Cart!", "success");
     } else {
-      req.flash("error", "Didnot added");
+      showToast("Product already in cart", "error");
     }
   })
-  .catch(err => console.error(err));
+  .catch(err => {
+    console.error(err);
+    showToast("Something went wrong", "error");
+  });
+}
+
+
+function showToast(message, type) {
+  // Create toast element
+  const toast = document.createElement("div");
+  toast.className = `fixed top-20 right-4 px-6 py-3 rounded-lg text-white z-50 transition-opacity duration-300 ${
+    type === "success" ? "bg-green-500" : "bg-red-500"
+  }`;
+  toast.textContent = message;
+  
+  document.body.appendChild(toast);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
 </script>
