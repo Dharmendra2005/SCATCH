@@ -1,11 +1,13 @@
 const express = require("express");
 const isLoggedIn = require("../middlewares/isLoggedIn");
 const userModel = require("../models/user-model");
+const addressModel = require("../models/address-model");
 
 const router = express.Router();
 
 router.get("/create-upi-session", isLoggedIn, async (req, res) => {
   try {
+    const address = await addressModel.findOne({ user: req.user._id });
     const user = await userModel
       .findById(req.user._id)
       .populate("cart.product");
@@ -22,7 +24,18 @@ router.get("/create-upi-session", isLoggedIn, async (req, res) => {
         quantity: item.quantity,
       })) || [];
 
-    res.render("upiSession", { cartItems });
+
+      const newOrder = {
+            items: req.user.cart,           // all cart items
+            address: address,           // address ID
+            paymentMethod: "UPI",
+            createdAt: new Date(),
+          };
+          await userModel.findByIdAndUpdate(req.user._id, {
+            $push: { orders: newOrder },
+            $set: { cart: [] }, // this clears cart
+          });
+    res.render("upiSession", { cartItems, address });
   } catch (err) {
     res.status(500).json({ error: "UPI session creation failed" });
   }
