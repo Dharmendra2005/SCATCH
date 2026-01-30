@@ -1,11 +1,116 @@
 <%- include('./partials/header') %>
 
+<div class="py-16 flex px-20 gap-6">
+    <!-- LEFT SIDE -->
+    <div class="w-[40%] ">
+        <!-- DELIVERY ESTIMATES -->
+        <div class="rounded-xl p-6 mb-6 mt-6">
+            <h3 class="text-lg font-semibold mb-4">Delivery Estimates</h3>
 
+            <!-- SCROLLABLE CONTAINER -->
+            <div class="space-y-4 max-h-[290px] overflow-y-auto pr-2">
 
+                <% cartItems.forEach(item => { %>
+                <div
+                    class="flex gap-4 items-center border-b last:border-b-0 pb-4">
 
+                    <img
+                        src="data:image/jpeg;base64,<%= item.image.toString('base64') %>"
+                        alt="<%= item.name %>"
+                        class="w-16 h-16 object-cover rounded-lg" />
 
+                    <div class="flex-1">
+                        <p class="font-medium text-sm"><%= item.name %></p>
+                        <p class="text-xs text-gray-400">
+                            Estimated delivery by <b>27 Jan 2026</b>
+                        </p>
+                    </div>
 
+                    <p class="text-green-600 font-semibold text-sm">
+                        ₹<%= item.price %>
+                    </p>
 
+                </div>
+                <% }) %>
 
+            </div>
+        </div>
+        <div>
+             <h1 class="text-lg font-semibold mb-4 px-8">Address</h1>
+             <div class="w-40 h-20 px-8 ">
+                <p class="text-md font-medium">123, Sample Street</p>
+                <p class="text-sm text-gray-500">City, State - 123456</p>
+             </div>
+        </div>
+    </div>
+
+    <!-- Page Wrapper (below fixed nav) -->
+    <div
+        class="w-[60%] min-h-screen flex align-items-end justify-center">
+
+        <!-- Payment Card -->
+        <div
+            class="w-[420px]  rounded-2xl p-6 flex flex-col gap-6">
+
+            <!-- Title -->
+            <div class="text-center">
+                <h2 class="text-xl font-semibold">Pay using UPI</h2>
+                <p class="text-sm text-gray-400">Google Pay • PhonePe •
+                    UPI</p>
+            </div>
+
+            <!-- Amount -->
+            <div
+                class="border-3 rounded-2xl p-4 text-center hover:bg-slate-600 transition">
+                <p class="text-xs text-gray-400">Amount Payable</p>
+                <p class="text-2xl  font-bold">₹499.00</p>
+            </div>
+
+            <!-- QR -->
+            <div class="flex flex-col items-center gap-3">
+                <div
+                    class="w-48 h-48 bg-white rounded-xl flex items-center justify-center">
+                    <span class="text-black text-sm">QR CODE</span>
+                </div>
+                <p class="text-xs text-gray-400 text-center">
+                    Scan with any UPI app
+                </p>
+            </div>
+
+            <!-- Divider -->
+            <div class="flex items-center gap-3">
+                <div class="flex-1 h-px"></div>
+                <span class="text-xs text-gray-400">OR</span>
+                <div class="flex-1 h-px"></div>
+            </div>
+
+            <!-- UPI ID -->
+            <div
+                class="hover:bg-slate-600 transition rounded-xl p-3 text-center">
+                <p class="text-xs text-gray-500">UPI ID</p>
+                <p class="font-mono text-sm">demo@upi</p>
+            </div>
+
+            <!-- Apps -->
+            <div class="flex gap-3">
+                <div
+                    class="flex-1 hover:bg-slate-600 transition rounded-xl p-3 text-center cursor-pointer">
+                    Google Pay
+                </div>
+                <div
+                    class="flex-1 hover:bg-slate-600 transition rounded-xl p-3 text-center cursor-pointer">
+                    PhonePe
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <p class="text-xs text-gray-400 text-center">
+                Complete payment in your UPI app
+            </p>
+
+        </div>
+
+    </div>
+</div>
 
 <%- include('./partials/footer') %>
