@@ -88,13 +88,18 @@
       <label class="text-xl flex gap-3 items-center">
         <input class="h-5 w-5" type="radio" name="paytype"
           value="ONLINE" required>
-        Online Payment (Card / UPI)
+        Online Payment (Card)
       </label>
       <p
         id="codNotice"
         class="hidden text-sm text-red-600 font-medium mt-2">
         ⚠️ ₹9 extra delivery fee applicable for Cash on Delivery
       </p>
+      <label class="text-xl flex gap-3 items-center">
+        <input class="h-5 w-5" type="radio" name="paytype"
+          value="upi" required>
+        Phone Pay / Google Pay
+      </label>
       <button
         id="payBtn"
         class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-full">
@@ -138,7 +143,6 @@
     (totalMrp - totalDiscount + platformFee).toFixed(0);
 </script>
 
-
 <script>
   const COD_FEE = 9;
   const totalAmountEl = document.getElementById("totalAmount");
@@ -170,11 +174,16 @@
 
         codBelowPayBtn.classList.add("hidden");
       }
+      if (radio.upi === "upi" && radio.checked){
+        codNotice.classList.add("hidden");
+
+        totalAmountEl.textContent = baseTotal.toFixed(0);
+
+        codBelowPayBtn.classList.add("hidden");
+      }
     });
   });
 </script>
-
-
 
 <script>
   const payBtn = document.getElementById("payBtn");
@@ -225,6 +234,33 @@
         payBtn.disabled = false;
         payBtn.innerText = "Pay Now";
       }
+    }
+    if(selected.value === "upi"){
+      payBtn.disabled = true;
+      payBtn.innerText = "Redirecting to payment...";
+
+      try{
+        const res = await fetch("/upi/create-upi-session", {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert("Payment failed. Try again.");
+          payBtn.disabled = false;
+          payBtn.innerText = "Pay Now";
+        }
+            }
+            catch (err) {
+              console.error(err);
+              alert("Something went wrong");
+              payBtn.disabled = false;
+              payBtn.innerText = "Pay Now";
+            }
     }
   });
 </script>
