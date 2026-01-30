@@ -52,10 +52,10 @@
                 <div
                     class="flex justify-between bg-[<%= product.panelcolor %>] items-center px-3 py-4 text-[<%= product.textcolor%>]">
                     <div>
-                        <h3 class="font-medium">
+                        <h3 class="text-sm">
                             <%= product.name %>
                         </h3>
-                        <h4 class="text-lg">₹ <%= product.price %></h4>
+                        <h4 class="text-sm">₹ <%= product.price %></h4>
                         <% if(product.discount > 0) { %>
                         <p class="text-sm text-green-600"><%= product.discount
                             %>% OFF</p>
