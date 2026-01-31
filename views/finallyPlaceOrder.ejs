@@ -242,7 +242,8 @@
       try{
         setTimeout(() => {
         window.location.href = "/upi/create-upi-session";
-      }, 2000);
+        payBtn.innerText = "Pay Now";
+      }, 1000);
       }catch (err) {
         console.error(err);
         alert("Something went wrong");
