@@ -61,14 +61,14 @@
           </span>
         </div>
 
-        <div class="flex flex-wrap gap-12 px-7 pb-3">
+        <div class="flex flex-wrap gap-10 px-7 pb-3">
           <button onclick="removeProduct('<%= item._id %>')"
-            class="text-sm hover:text-red-600">
+            class="text-sm text-black hover:text-red-600 bg-red-100 rounded px-2 py-1">
             Delete
           </button>
 
           <% if (item.discount > 0) { %>
-          <p class="text-sm text-green-600"><%= item.discount %>% OFF</p>
+          <p class="text-sm rounded bg-green-100 text-green-600 px-2 py-1"><%= item.discount %>% OFF</p>
           <% } %>
         </div>
 
