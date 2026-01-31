@@ -83,14 +83,14 @@
             <div
                 class="border-3 rounded-2xl p-4 text-center hover:bg-slate-600 transition">
                 <p class="text-xs text-gray-400">Amount Payable</p>
-                <p class="text-2xl  font-bold">₹499.00</p>
+                <p class="text-2xl font-bold">₹<%= totalAmount.toFixed(2) %></p>
             </div>
 
             <!-- QR -->
             <div class="flex flex-col items-center gap-3">
                 <div
-                    class="w-48 h-48 bg-white rounded-xl flex items-center justify-center">
-                    <span class="text-black text-sm">QR CODE</span>
+                    class="w-48 h-48 bg-white rounded-xl flex items-center justify-center p-2">
+                    <img src="<%= qrCodeImage %>" alt="UPI QR Code" class="w-full h-full object-contain" />
                 </div>
                 <p class="text-xs text-gray-400 text-center">
                     Scan with any UPI app
@@ -99,17 +99,18 @@
 
             <!-- Divider -->
             <div class="flex items-center gap-3">
-                <div class="flex-1 h-px"></div>
+                <div class="flex-1 h-px bg-gray-600"></div>
                 <span class="text-xs text-gray-400">OR</span>
-                <div class="flex-1 h-px"></div>
+                <div class="flex-1 h-px bg-gray-600"></div>
             </div>
 
             <!-- UPI ID -->
             <div
                 class="hover:bg-slate-600 transition rounded-xl p-3 text-center">
                 <p class="text-xs text-gray-500">UPI ID</p>
-                <p class="font-mono text-sm">demo@upi</p>
+                <p class="font-mono text-sm"><%= upiId %></p>
             </div>
+
 
             <!-- Apps -->
             <div class="flex gap-3">
