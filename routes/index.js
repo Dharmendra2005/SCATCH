@@ -24,8 +24,12 @@ router.get("/", function (req, res) {
 
 router.get("/shop", isLoggedIn, async (req, res) => {
   try {
-    let products = await productModel.find();
+    let products = await productModel.find().sort({ createdAt: -1 });
     const { sortby, category, discount, available } = req.query;
+
+    // Get user's cart items
+    const user = await userModel.findById(req.user._id);
+    const cartProductIds = user.cart.map((item) => item.product.toString());
 
     // Apply sorting
     if (sortby) {
@@ -54,12 +58,16 @@ router.get("/shop", isLoggedIn, async (req, res) => {
 
     let error = req.flash("error");
     let success = req.flash("success");
-    // console.log("Products found:", products.length);
-    // console.log("Filters applied:", { sortby, category, discount, available });
-    res.render("shop", { products, loggedin: true, error, success });
+    res.render("shop", {
+      products,
+      loggedin: true,
+      error,
+      success,
+      cartProductIds,
+    });
   } catch (error) {
     console.error("Shop error:", error);
-    res.render("shop", { products: [], loggedin: true });
+    res.render("shop", { products: [], loggedin: true, cartProductIds: [] });
   }
 });
 
@@ -98,14 +106,10 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
     const productId = req.params.productId;
     const userId = req.user._id;
 
-    // console.log("Adding to cart - Product ID:", productId, "User ID:", userId);
-
     // Check if product exists
     const product = await productModel.findById(productId);
     if (!product) {
-      // console.log("Product not found:", productId);
-      req.flash("error", "Product not found");
-      return res.redirect("/shop");
+      return res.json({ success: false, message: "Product not found" });
     }
 
     // Check if product already in cart
@@ -115,9 +119,7 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
     );
 
     if (existingCartItem) {
-      // console.log("Product already in cart");
-      req.flash("error", "Product already in cart");
-      return res.redirect("/shop");
+      return res.json({ success: false, message: "Product already in cart" });
     }
 
     // Add product to user's cart
@@ -125,12 +127,9 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
       $push: { cart: { product: productId, quantity: 1 } },
     });
 
-    req.flash("success", "Product added to cart");
-    res.redirect("/shop");
+    res.json({ success: true, message: "Product added to cart" });
   } catch (error) {
-    console.error("Add to cart error:", error);
-    req.flash("error", "Failed to add product to cart");
-    res.redirect("/shop");
+    res.status(500).json({ success: false, message: "Failed to add product" });
   }
 });
 
@@ -234,9 +233,13 @@ router.post("/create", async (req, res) => {
     const token = generateToken(owner);
     res.cookie("owner", token);
 
+    // Fetch all products from database
+    const products = await productModel.find().sort({ createdAt: 1 });
+
     res.render("createproducts", {
-      products: owner.products || [],
+      products: products,
       success: "Welcome, " + owner.username,
+      error: [],
     });
   } catch (err) {
     console.error(err);
