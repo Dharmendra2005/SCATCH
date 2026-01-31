@@ -61,11 +61,14 @@
                             %>% OFF</p>
                         <% } %>
                     </div>
+                     <% const isInCart = cartProductIds.includes(product._id.toString()); %>
                     <button
                         type="button"
+                        id="cartBtn-<%= product._id %>"
                         onclick="addToCart('<%= product._id %>')"
-                        class="w-9 h-9 flex items-center justify-center rounded-full text-black bg-white mr-10 hover:bg-gray-600 transition-colors">
-                        <i class="ri-add-line text-lg"></i>
+                        <%= isInCart ? "disabled" : "" %>
+                        class="w-9 h-9 flex items-center justify-center rounded-full text-black mr-10 transition-colors <%= isInCart ? 'bg-green-100' : 'bg-white hover:bg-gray-600' %>">
+                        <i id="cartIcon-<%= product._id %>" class="<%= isInCart ? 'ri-check-line text-lg text-green-600' : 'ri-add-line text-lg' %>"></i>
                     </button>
 
                 </div>
@@ -90,22 +93,34 @@
 
 <script>
 function addToCart(productId) {
-  fetch(`/addtocart/${productId}`, {
+  const btn = document.getElementById(`cartBtn-${productId}`);
+  const icon = document.getElementById(`cartIcon-${productId}`);
+  
+  // Disable button while processing
+  btn.disabled = true;
+   fetch(`/addtocart/${productId}`, {
     method: "post",
     credentials: "include"
   })
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      // Use browser alert or a toast notification
+      // Change icon to checkmark
+      icon.className = "ri-check-line text-lg text-green-600";
+      btn.classList.add("bg-green-100");
       showToast("Added to Cart!", "success");
     } else {
+      // Already in cart - show checkmark too
+      icon.className = "ri-check-line text-lg text-green-600";
+      btn.classList.add("bg-green-100");
       showToast("Product already in cart", "error");
+      btn.disabled = true;
     }
   })
   .catch(err => {
     console.error(err);
     showToast("Something went wrong", "error");
+    btn.disabled = false;
   });
 }
 
