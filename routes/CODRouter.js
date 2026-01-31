@@ -16,7 +16,6 @@ router.get("/orders-place-cod", isLoggedIn, async (req, res) => {
       paymentMethod: "COD",
       createdAt: new Date(),
     };
-    // console.log(newOrder);
     await userModel.findByIdAndUpdate(userid, {
       $push: { orders: newOrder },
       $set: { cart: [] }, // this clears cart

@@ -10,7 +10,7 @@ const router = express.Router();
 
 
 router.get("/items", async (req, res) => {
-  let products = await productModel.find().sort({ createdAt: 1 });
+  let products = await productModel.find().sort({ createdAt: -1 });
   let error = req.flash("error");
   let success = req.flash("success");
   //have to send sucess msg
