@@ -104,6 +104,10 @@
     <a href="/cart" class="hover:text-blue-500">Cart</a>
   <% } %>
 
+   <% if (ownerLoggedIn) { %>
+    <a href="/owners/ownerdashboard" class="hover:text-blue-500">Dashboard</a>
+  <% } %>
+
   <!-- Logout: user OR owner -->
   <% if (loggedin || ownerLoggedIn) { %>
     <a href="/logout" class="hover:text-blue-500">Logout</a>

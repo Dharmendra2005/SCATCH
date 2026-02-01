@@ -1,27 +1,35 @@
 const jwt = require("jsonwebtoken");
+const ownerModel = require("../models/owners-model");
 
+const JWT_KEY = process.env.JWT_KEY || "shhhhhhhhhhhhhh";
 
-module.exports = (req, res, next) => {
-  if (!req.cookies.owner) {
+async function isOwnerLoggedIn(req, res, next) {
+  const token = req.cookies.owner;
+
+  // No owner cookie → block
+  if (!token) {
     req.flash("error", "Please log in as owner");
     return res.redirect("/owners/create");
   }
-  next();
-};
-
-module.exports = function isOwnerLoggedIn(req, res, next) {
-  const token = req.cookies.owner;
-
-  // ❌ No owner cookie → block
-  if (!token) {
-    return res.status(401).send("Access denied: Owner login required");
-  }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.owner = decoded;
+    const decoded = jwt.verify(token, JWT_KEY);
+    const owner = await ownerModel.findOne({ email: decoded.email });
+
+    if (!owner) {
+      req.flash("error", "Owner not found");
+      return res.redirect("/owners/create");
+    }
+
+    req.owner = owner;
+    req.ownerId = owner._id;
     next(); // ✅ allow access
   } catch (err) {
-    return res.status(401).send("Invalid or expired token");
+    console.error("Owner token verification error:", err);
+    req.flash("error", "Invalid or expired token");
+    res.clearCookie("owner");
+    return res.redirect("/owners/create");
   }
-};
+}
+
+module.exports = isOwnerLoggedIn;
