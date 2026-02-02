@@ -31,11 +31,11 @@ const userCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 app.use(async (req, res, next) => {
-  res.locals.loggedin = !!req.cookies.token;
-  res.locals.ownerLoggedIn = !!req.cookies.owner;
+  res.locals.loggedin = false;
+  res.locals.ownerLoggedIn = false;
   res.locals.user = null;
 
-  // Fetch user data if logged in
+  // Check user token
   if (req.cookies.token) {
     try {
       const decoded = jwt.verify(
@@ -49,6 +49,7 @@ app.use(async (req, res, next) => {
 
       if (cachedUser && Date.now() - cachedUser.timestamp < CACHE_TTL) {
         res.locals.user = cachedUser.data;
+        res.locals.loggedin = true;
       } else {
         const user = await userModel
           .findOne({ email: decoded.email })
@@ -62,27 +63,45 @@ app.use(async (req, res, next) => {
             timestamp: Date.now(),
           });
           res.locals.user = user;
+          res.locals.loggedin = true;
+        } else {
+          // User not found, clear invalid token
+          res.clearCookie("token");
         }
       }
     } catch (err) {
-      console.error("Auth middleware error:", err);
       // Token invalid, clear it
       res.clearCookie("token");
-      res.locals.loggedin = false;
     }
   }
+
+  // Check owner token
+  if (req.cookies.owner) {
+    try {
+      const decoded = jwt.verify(
+        req.cookies.owner,
+        process.env.JWT_KEY || "shhhhhhhhhhhhhh",
+      );
+
+      // Validate owner exists (optional - you can add owner lookup here)
+      res.locals.ownerLoggedIn = true;
+    } catch (err) {
+      // Owner token invalid, clear it
+      res.clearCookie("owner");
+    }
+  }
+
   next();
 });
 app.use(
   expressSession({
     resave: false,
     saveUninitialized: false,
-    secret: process.env.JWT_KEY || "shhhhhhhhhhhhhh",
+    secret: process.env.JWT_KEY,
   }),
 );
 app.use(flash());
-app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
-
+app.use(session({ secret: process.env.JWT_KEY, resave: false, saveUninitialized: false }));
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
