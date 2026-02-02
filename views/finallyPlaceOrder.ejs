@@ -113,6 +113,25 @@
 
     </div>
 
+    <!-- DELIVERY ADDRESS DISPLAY -->
+    <% if (address) { %>
+    <div class="shadow-lg rounded-xl p-6 mb-6">
+      <h3 class="text-lg font-semibold mb-4">Delivery Address</h3>
+      <div class="border rounded-lg p-4">
+        <p class="font-medium"><%= address.name %></p>
+        <p class="text-sm"><%= address.House_no %>, <%=
+          address.Address %></p>
+        <p class="text-sm ">PIN: <%= address.PinCode %></p>
+        <p class="text-sm ">📱 <%= address.Mobile_no %></p>
+        <span
+          class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs rounded mt-2">
+          <%= address.addressType.toUpperCase() %>
+        </span>
+      </div>
+    </div>
+    <% } %>
+
+
   </div>
 </div>
 <%- include('./partials/footer') %>
@@ -187,6 +206,7 @@
 
 <script>
   const payBtn = document.getElementById("payBtn");
+  const addressId = "<%= addressId %>";
 
   payBtn.addEventListener("click", async () => {
     const selected = document.querySelector('input[name="paytype"]:checked');
@@ -200,7 +220,7 @@
    
     if (selected.value === "COD" && cartItems.length > 0) {
   alert("₹9 delivery fee has been added for Cash on Delivery");
-  window.location.href = "/COD/orders-place-cod";
+  window.location.href = `/COD/orders-place-cod?addressId=${addressId}`;
   return;
 }
 
@@ -215,7 +235,8 @@
           method: "post",
           headers: {
             "Content-Type": "application/json"
-          }
+          },
+          body: JSON.stringify({ addressId: addressId })
         });
 
         const data = await res.json();
@@ -235,13 +256,13 @@
         payBtn.innerText = "Pay Now";
       }
     }
-    // 🔵
+    // 🔵 UPI PAYMENT
     if(selected.value === "upi"){
       payBtn.disabled = true;
       payBtn.innerText = "Redirecting to payment...";
       try{
         setTimeout(() => {
-        window.location.href = "/upi/create-upi-session";
+        window.location.href = `/upi/create-upi-session?addressId=${addressId}`;
         payBtn.innerText = "Pay Now";
       }, 1000);
       }catch (err) {
