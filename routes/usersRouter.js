@@ -39,7 +39,18 @@ router.delete("/delete/:id", isLoggedIn, async (req, res) => {
 });
 
 router.get("/payment", isLoggedIn, async (req, res) => {
+  const addressId = req.query.addressId;
+
+  if (!addressId) {
+    return res.status(400).send("Address ID required");
+  }
+
   const user = await userModel.findById(req.user._id).populate("cart.product");
+  const address = await addressModel.findById(addressId);
+
+  if (!address) {
+    return res.status(400).send("Address not found");
+  }
 
   // Transform cart items to include product details with quantity
   const cartItems =
@@ -55,7 +66,7 @@ router.get("/payment", isLoggedIn, async (req, res) => {
       quantity: item.quantity,
     })) || [];
 
-  res.render("finallyPlaceOrder", { cartItems });
+  res.render("finallyPlaceOrder", { cartItems, address, addressId });
 });
 
 router.post("/cart/update", isLoggedIn, async (req, res) => {

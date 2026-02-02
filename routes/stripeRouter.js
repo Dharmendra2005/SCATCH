@@ -8,6 +8,12 @@ const isLoggedIn = require("../middlewares/isLoggedIn");
 
 router.post("/create-checkout-session", isLoggedIn, async (req, res) => {
   try {
+    const addressId = req.body.addressId || req.query.addressId;
+
+    if (!addressId) {
+      return res.status(400).json({ error: "Address ID required" });
+    }
+
     const user = await userModel
       .findById(req.user._id)
       .populate("cart.product");
@@ -48,7 +54,7 @@ router.post("/create-checkout-session", isLoggedIn, async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.protocol}://${req.get("host")}/stripe/orders-success`,
+      success_url: `${req.protocol}://${req.get("host")}/stripe/orders-success?addressId=${addressId}`,
       cancel_url: `${req.protocol}://${req.get("host")}/orders/cancel`,
     });
 
@@ -63,8 +69,16 @@ router.get("/orders-success", isLoggedIn, async (req, res) => {
   try {
     const userid = req.user._id;
     const user = await userModel.findById(userid).populate("cart.product");
-    const address = await addressModel.findById(userid);
-    // if (!address) return res.status(400).send("Address not found");
+    const addressId = req.query.addressId;
+
+    if (!addressId) {
+      return res.status(400).send("Address ID required");
+    }
+
+    const address = await addressModel.findById(addressId);
+    if (!address) {
+      return res.status(400).send("Address not found");
+    }
 
     // Transform cart items to include product details with quantity
     const orderItems = user.cart
@@ -76,7 +90,7 @@ router.get("/orders-success", isLoggedIn, async (req, res) => {
 
     const newOrder = {
       items: orderItems, // all cart items with quantity
-      address: address, // address ID
+      address: addressId, // store address ID reference, not full object
       paymentMethod: "Stripe",
       createdAt: new Date(),
     };

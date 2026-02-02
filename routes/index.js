@@ -250,6 +250,8 @@ router.post("/create", async (req, res) => {
 router.get("/logout", (req, res) => {
   console.log("User logging out");
   res.clearCookie("token");
+  res.clearCookie("owner");
+  req.flash("success", "Logged out successfully");
   res.redirect("/");
 });
 

@@ -7,12 +7,22 @@ const QRCode = require("qrcode");
 const router = express.Router();
 
 // Your UPI details
-const UPI_ID = "636@ybl";  // ← Replace with your real UPI ID
-const MERCHANT_NAME = "SCATCH";  // ← Replace with your name/store name
+const UPI_ID = "636@ybl"; // ← Replace with your real UPI ID
+const MERCHANT_NAME = "SCATCH"; // ← Replace with your name/store name
 
 router.get("/create-upi-session", isLoggedIn, async (req, res) => {
   try {
-    const address = await addressModel.findOne({ user: req.user._id });
+    const addressId = req.query.addressId;
+
+    if (!addressId) {
+      return res.status(400).send("Address ID required");
+    }
+
+    const address = await addressModel.findById(addressId);
+    if (!address) {
+      return res.status(400).send("Address not found");
+    }
+
     const user = await userModel
       .findById(req.user._id)
       .populate("cart.product");
@@ -32,13 +42,13 @@ router.get("/create-upi-session", isLoggedIn, async (req, res) => {
 
     // Calculate total amount
     let totalAmount = 0;
-    cartItems.forEach(item => {
+    cartItems.forEach((item) => {
       const price = Number(item.price);
       const qty = Number(item.quantity || 1);
       const discount = Number(item.discount || 0);
       const mrp = price * qty;
-      const dis = (mrp * discount) / 100;  
-      totalAmount += (mrp - dis);
+      const dis = (mrp * discount) / 100;
+      totalAmount += mrp - dis;
     });
     totalAmount += 35; // Platform fee
 
@@ -51,13 +61,13 @@ router.get("/create-upi-session", isLoggedIn, async (req, res) => {
       margin: 2,
       color: {
         dark: "#000000",
-        light: "#ffffff"
-      }
+        light: "#ffffff",
+      },
     });
 
     const newOrder = {
       items: user.cart,
-      address: address,
+      address: addressId, // store address ID reference
       paymentMethod: "UPI",
       createdAt: new Date(),
     };
@@ -67,14 +77,13 @@ router.get("/create-upi-session", isLoggedIn, async (req, res) => {
       $set: { cart: [] },
     });
 
-    res.render("upiSession", { 
-      cartItems, 
-      address, 
-      qrCodeImage,  // Pass QR code to view
+    res.render("upiSession", {
+      cartItems,
+      address,
+      qrCodeImage, // Pass QR code to view
       totalAmount,
-      upiId: UPI_ID
+      upiId: UPI_ID,
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "UPI session creation failed" });

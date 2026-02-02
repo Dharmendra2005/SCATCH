@@ -7,7 +7,8 @@
         <div class="rounded-xl p-6 mb-6 mt-6">
             <h4 class="text-2xl mb-5">Create your Address</h4>
 
-            <form autocomplete="off" action="/address/collectAddress"
+            <form id="addressForm" autocomplete="off"
+                action="/address/collectAddress"
                 method="post">
 
                 <!-- CONTACT DETAILS -->
@@ -108,10 +109,11 @@
                 </div>
 
                 <div class="mb-4 mt-8">
-                    <input type="checkbox" name="defaultAddress" required>
+                    <input type="checkbox" name="defaultAddress">
                     Make this my default address
                 </div>
                 <input
+                    id="CreateAddressbtn"
                     type="submit"
                     value="Create My Address"
                     class=" mb-4 px-6 py-3 rounded-full bg-blue-600 text-white hover:bg-blue-700" />
@@ -130,7 +132,8 @@
                 <div
                     class=" w-[600px] max-h-[80vh] rounded-xl p-6 overflow-y-auto">
 
-                    <div class="flex justify-between items-center mb-4 text-white">
+                    <div
+                        class="flex justify-between items-center mb-4 text-white">
                         <h2 class="text-lg font-semibold">Select Delivery
                             Address</h2>
                         <button id="closeModal" class="text-xl">&times;</button>
@@ -145,7 +148,7 @@
                                 type="radio"
                                 name="selectedAddress"
                                 value="<%= address._id %>"
-                                <%= address.defaultAddress ? "checked" : " " %>
+                                <%=address.defaultAddress ? "checked" : " " %>
                             />
                             <strong><%= address.name %></strong>
 
@@ -318,7 +321,6 @@
   });
 </script>
 
-
 <!-- for Use my Default Address button -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -348,6 +350,9 @@
     });
 
   });
+
+
+
 </script>
 
 <script>
@@ -374,4 +379,138 @@
   document.getElementById("totalDiscount").textContent = totalDiscount.toFixed(0);
   document.getElementById("totalAmount").textContent =
     (totalMrp - totalDiscount + platformFee).toFixed(0);
+</script>
+
+<!-- Toast Container -->
+<div id="toast"
+    class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full opacity-0 transition-all duration-300 z-50">
+    <div class="flex items-center gap-2">
+        <i class="ri-checkbox-circle-line text-lg"></i>
+        <span id="toastMessage">Address created successfully!</span>
+    </div>
+</div>
+
+<script>
+  // Address form AJAX submission
+  document.getElementById('addressForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('CreateAddressbtn');
+    const originalText = submitBtn.value;
+    
+    // Disable button and show loading
+    submitBtn.disabled = true;
+    submitBtn.value = 'Creating...';
+    
+    try {
+      const formData = new FormData(this);
+      
+      // Convert FormData to URLSearchParams for proper encoding
+      const urlParams = new URLSearchParams();
+      for (let [key, value] of formData.entries()) {
+        urlParams.append(key, value);
+      }
+      
+      const response = await fetch('/address/collectAddress', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: urlParams,
+        credentials: 'include'
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Show success toast
+        showToast('Address created successfully!', 'success');
+        
+        // Reset form
+        this.reset();
+        
+        // Add new address to the list
+        if (result.address) {
+          addAddressToList(result.address);
+        }
+        
+      } else {
+        showToast(result.message || 'Failed to create address', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error creating address:', error);
+      showToast('Something went wrong. Please try again.', 'error');
+    }
+    
+    // Re-enable button
+    submitBtn.disabled = false;
+    submitBtn.value = originalText;
+  });
+  
+  // Toast function
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    
+    // Update message
+    toastMessage.textContent = message;
+    
+    // Update colors based on type
+    if (type === 'success') {
+      toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-0 opacity-100 transition-all duration-300 z-50';
+    } else {
+      toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-0 opacity-100 transition-all duration-300 z-50';
+    }
+    
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+      toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full opacity-0 transition-all duration-300 z-50';
+    }, 3000);
+  }
+  
+  // Function to add new address to the list
+  function addAddressToList(address) {
+    const addressContainer = document.querySelector('.shadow-md.rounded-xl.p-6.mb-6.mt-6');
+    if (!addressContainer) return;
+    
+    // Find existing addresses container or create one
+    let addressesList = addressContainer.querySelector('.space-y-4');
+    if (!addressesList) {
+      const noAddressMsg = addressContainer.querySelector('p');
+      if (noAddressMsg && noAddressMsg.textContent.includes('No saved addresses')) {
+        noAddressMsg.remove();
+      }
+      
+      addressesList = document.createElement('div');
+      addressesList.className = 'space-y-4';
+      addressContainer.appendChild(addressesList);
+    }
+    
+    // Create new address HTML
+    const addressHTML = `
+      <div class="border rounded-lg p-4 mb-4 bg-secondary">
+        <div class="flex items-center h-8 w-8 gap-2">
+          <input
+            type="radio"
+            name="selectedAddress"
+            value="${address._id}"
+            ${address.defaultAddress ? 'checked' : ''}
+          />
+          <strong>${address.name}</strong>
+          <span class="text-xs bg-green-100 text-green-700 px-2 rounded">
+            ${address.addressType.toUpperCase()}
+          </span>
+        </div>
+        <p class="mt-2">
+          ${address.House_no}, ${address.Address}
+        </p>
+        <p>Pin: ${address.PinCode}</p>
+        <p>Mobile: ${address.Mobile_no}</p>
+      </div>
+    `;
+    
+    addressesList.insertAdjacentHTML('afterbegin', addressHTML);
+  }
 </script>
