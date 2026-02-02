@@ -8,11 +8,20 @@ const router = express.Router();
 router.get("/orders-place-cod", isLoggedIn, async (req, res) => {
   try {
     const userid = req.user._id;
-    const address = await addressModel.findById(userid);
-    // if (!address) return res.status(400).send("Address not found");
+    const addressId = req.query.addressId;
+
+    if (!addressId) {
+      return res.status(400).send("Address ID required");
+    }
+
+    const address = await addressModel.findById(addressId);
+    if (!address) {
+      return res.status(400).send("Address not found");
+    }
+
     const newOrder = {
-      items: req.user.cart,           // all cart items
-      address: address,           // address ID
+      items: req.user.cart, // all cart items
+      address: addressId, // store address ID reference, not full object
       paymentMethod: "COD",
       createdAt: new Date(),
     };
@@ -20,8 +29,7 @@ router.get("/orders-place-cod", isLoggedIn, async (req, res) => {
       $push: { orders: newOrder },
       $set: { cart: [] }, // this clears cart
     });
-    res.render("orderSuccess", {address});
-
+    res.render("orderSuccess", { address });
   } catch (err) {
     console.error(err.message);
     res.status(501).send("Something went wrong");

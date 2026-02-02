@@ -36,12 +36,14 @@ router.post("/collectAddress", isLoggedIn, async (req, res) => {
   try {
     let { name, number, pincode, house, street, addtype, defaultAddress } =
       req.body;
+
     if (defaultAddress) {
       await addressModel.updateMany(
         { user: req.user._id },
         { $set: { defaultAddress: false } },
       );
     }
+
     let address = await addressModel.create({
       user: req.user._id,
       name,
@@ -57,9 +59,28 @@ router.post("/collectAddress", isLoggedIn, async (req, res) => {
       $push: { Address: address._id },
     });
 
-    res.redirect("/address/placeorder");
+    // Check if request expects JSON (AJAX)
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      res.json({
+        success: true,
+        message: "Address created successfully",
+        address: address,
+      });
+    } else {
+      // Fallback for regular form submission
+      res.redirect("/address/placeorder");
+    }
   } catch (err) {
     console.error(err.message);
+
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to create address. Please try again.",
+      });
+    } else {
+      res.status(500).send("Something went wrong");
+    }
   }
 });
 
