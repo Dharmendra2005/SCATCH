@@ -106,6 +106,7 @@
 
    <% if (ownerLoggedIn) { %>
     <a href="/owners/ownerdashboard" class="hover:text-blue-500">Dashboard</a>
+    <a href="/products/items">Create</a>
   <% } %>
 
   <!-- Logout: user OR owner -->
@@ -114,9 +115,7 @@
   <% } %>
 
   <!-- Admin Access: always visible -->
-  <% if (ownerLoggedIn) { %>
-    <a href="/owners/admin" class="ri-admin-line text-2xl hover:text-blue-500"></a>
-  <% } else { %>
+  <% if (!ownerLoggedIn) { %>
     <a href="/create" class="ri-admin-line text-2xl hover:text-blue-500"></a>
   <% } %>
 
