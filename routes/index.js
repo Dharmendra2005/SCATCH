@@ -177,7 +177,9 @@ router.post("/checkout", isLoggedIn, async (req, res) => {
 
 //Admin Access
 router.get("/create", (req, res) => {
-  res.render("owner-login");
+  let error = req.flash("error");
+  let success = req.flash("success");
+  res.render("owner-login", { error, success });
 });
 
 // Create Owner ONLY via Postman
@@ -222,28 +224,25 @@ router.post("/create", async (req, res) => {
 
     const owner = await ownerModel.findOne({ email });
     if (!owner) {
-      return res.send("Owner not found");
+      req.flash("error", "Owner not found");
+      return res.redirect("/create");
     }
 
     const isMatch = await bcrypt.compare(password, owner.password);
     if (!isMatch) {
-      return res.send("Wrong password");
+      req.flash("error", "Something went wrong");
+      return res.redirect("/create");
     }
 
     const token = generateToken(owner);
     res.cookie("owner", token);
 
-    // Fetch all products from database
-    const products = await productModel.find().sort({ createdAt: 1 });
-
-    res.render("createproducts", {
-      products: products,
-      success: "Welcome, " + owner.username,
-      error: [],
-    });
+    req.flash("success", "Welcome, " + owner.username);
+    return res.redirect("/products/items");
   } catch (err) {
     console.error(err);
-    res.send("Something went wrong");
+    req.flash("error", "Something went wrong");
+    return res.redirect("/create");
   }
 });
 

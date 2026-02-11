@@ -1,10 +1,28 @@
 <%- include('./partials/header') %>
+<% if(error && error.length>0){ %>
+<div id="flash-error"
+  class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-red-500 z-50 transition-opacity duration-300">
+  <span class="inline-block mt-1 mb-1 text-white"> <%= error %> </span>
+</div>
+<% } %>
 <% if(success && success.length>0){ %>
-<div
-  class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-blue-500">
+<div id="flash-success"
+  class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-green-500 z-50 transition-opacity duration-300">
   <span class="inline-block mt-1 mb-1 text-white"> <%= success %> </span>
 </div>
 <% } %>
+<script>
+  setTimeout(() => {
+    const flashError = document.getElementById('flash-error');
+    const flashSuccess = document.getElementById('flash-success');
+    [flashError, flashSuccess].forEach(el => {
+      if (el) {
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 300);
+      }
+    });
+  }, 3000);
+</script>
 
 <div class="min-h-screen flex flex-col">
   <div class="container px-10 py-20 flex flex-grow">

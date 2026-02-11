@@ -44,3 +44,5 @@ router.post("/create-checkout-session", async (req, res) => {
     res.status(500).json({ error: "Stripe error" });
   }
 });
+
+module.exports = router;

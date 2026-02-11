@@ -5,7 +5,6 @@ const app = express();
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const flash = require("express-flash");
-const session = require("express-session");
 const compression = require("compression");
 const db = require("./config/mongoose-connection");
 const ownersRouter = require("./routes/ownersRouter");
@@ -25,6 +24,16 @@ const expressSession = require("express-session");
 app.use(compression());
 
 app.use(cookieParser());
+
+// Session and flash must come BEFORE auth middleware
+app.use(
+  expressSession({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.JWT_KEY,
+  }),
+);
+app.use(flash());
 
 // Cache user data to avoid repeated database calls
 const userCache = new Map();
@@ -93,15 +102,7 @@ app.use(async (req, res, next) => {
 
   next();
 });
-app.use(
-  expressSession({
-    resave: false,
-    saveUninitialized: false,
-    secret: process.env.JWT_KEY,
-  }),
-);
-app.use(flash());
-app.use(session({ secret: process.env.JWT_KEY, resave: false, saveUninitialized: false }));
+
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

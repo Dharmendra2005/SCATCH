@@ -21,8 +21,8 @@ module.exports.registerUser = async function (req, res) {
         });
         let token = generateToken(user);
         res.cookie("token", token);
-        req.flash("success", "Your registration is successfuly");
-        return res.redirect("/");
+        req.flash("success", "Registration successful! Welcome to Scatch");
+        return res.redirect("/shop");
       });
     });
   } catch (err) {
@@ -43,12 +43,8 @@ module.exports.loginUser = async function (req, res) {
     if (result) {
       let token = generateToken(user);
       res.cookie("token", token);
-      let products = await productModel.find().sort({ createdAt: -1 });
-      // Get cart product IDs from the user's cart
-      const cartProductIds = user.cart
-        ? user.cart.map((id) => id.toString())
-        : [];
-      res.render("shop", { products, cartProductIds });
+      req.flash("success", `Welcome🙏 ${user.fullname}`);
+      return res.redirect("/shop");
     } else {
       req.flash("error", "Email or Password incorrect.");
       return res.redirect("/");

@@ -19,16 +19,33 @@ router.get("/orders-place-cod", isLoggedIn, async (req, res) => {
       return res.status(400).send("Address not found");
     }
 
+    // Get user with populated cart items
+    const user = await userModel.findById(userid).populate("cart.product");
+
+    // Transform cart items to include product details with quantity
+    const orderItems = user.cart
+      .filter((item) => item.product != null)
+      .map((item) => ({
+        product: item.product,
+        quantity: item.quantity || 1,
+      }));
+
+    if (orderItems.length === 0) {
+      return res.status(400).send("Cart is empty");
+    }
+
     const newOrder = {
-      items: req.user.cart, // all cart items
-      address: addressId, // store address ID reference, not full object
+      items: orderItems,
+      address: addressId,
       paymentMethod: "COD",
       createdAt: new Date(),
     };
+
     await userModel.findByIdAndUpdate(userid, {
       $push: { orders: newOrder },
-      $set: { cart: [] }, // this clears cart
+      $set: { cart: [] },
     });
+
     res.render("orderSuccess", { address });
   } catch (err) {
     console.error(err.message);

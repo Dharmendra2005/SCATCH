@@ -18,4 +18,4 @@ const addressSchema = new mongoose.Schema({
   defaultAddress: Boolean
 });
 
-module.exports = mongoose.model.address || mongoose.model("address", addressSchema);
+module.exports = mongoose.models.address || mongoose.model("address", addressSchema);

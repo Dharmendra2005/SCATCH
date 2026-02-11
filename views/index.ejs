@@ -1,18 +1,28 @@
 <%- include('./partials/header') %>
- <% if(error && error.length>0){ %>
-<div
-  class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-red-500"
->
+<% if(error && error.length>0){ %>
+<div id="flash-error"
+  class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-red-500 z-50 transition-opacity duration-300">
   <span class="inline-block mt-1 mb-1 text-white"> <%= error %> </span>
 </div>
-<% } %> <% if(success && success.length > 0){ %>
-<!-- Add this new block for success messages -->
-<div
-  class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-green-500"
->
+<% } %>
+<% if(success && success.length > 0){ %>
+<div id="flash-success"
+  class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-green-500 z-50 transition-opacity duration-300">
   <span class="inline-block mt-1 mb-1 text-white"> <%= success[0] %> </span>
 </div>
 <% } %>
+<script>
+  setTimeout(() => {
+    const flashError = document.getElementById('flash-error');
+    const flashSuccess = document.getElementById('flash-success');
+    [flashError, flashSuccess].forEach(el => {
+      if (el) {
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 300);
+      }
+    });
+  }, 3000);
+</script>
 <div class="w-full h-screen flex px-20 bg-primary">
   <div class="w-1/2 flex items-center justify-center h-screen">
     <div class="w-full px-32">
@@ -26,27 +36,23 @@
           type="text"
           placeholder="Full Name"
           name="fullname"
-          required
-        />
+          required />
         <input
           class="bg-secondary block w-full px-3 py-2 border-[1px] rounded-md mb-3 border-custom text-primary"
           type="email"
           placeholder="Email"
           name="email"
-          required
-        />
+          required />
         <input
           class="bg-secondary block w-full px-3 py-2 border-[1px] rounded-md mb-3 border-custom text-primary"
           type="password"
           placeholder="Password"
           name="password"
-          required
-        />
+          required />
         <input
           class="px-5 rounded-full py-3 mt-2 accent-bg text-white accent-hover"
           type="submit"
-          value="Create My Account"
-        />
+          value="Create My Account" />
       </form>
     </div>
   </div>
@@ -59,20 +65,17 @@
           type="email"
           placeholder="Email"
           name="email"
-          required
-        />
+          required />
         <input
           class="block bg-secondary w-full px-3 py-2 border-[1px] rounded-md mb-3 border-custom text-primary"
           type="password"
           placeholder="Password"
           name="password"
-          required
-        />
+          required />
         <input
           class="px-5 block rounded-full py-3 mt-2 accent-bg text-white accent-hover"
           type="submit"
-          value="Login"
-        />
+          value="Login" />
       </form>
     </div>
   </div>
