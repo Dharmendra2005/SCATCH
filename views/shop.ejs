@@ -88,10 +88,37 @@
                             <%= product.name %>
                         </h3>
                         <h4 class="text-sm">₹ <%= product.price %></h4>
-                        <% if(product.discount > 0) { %>
-                        <p class="text-sm text-green-600"><%= product.discount
-                            %>% OFF</p>
-                        <% } %>
+                        <div class="flex items-center text-sm gap-2 mt-2">
+                            <% if(product.discount > 0) { %>
+                            <p class="text-green-600"><%= product.discount
+                                %>% OFF</p>
+                            <% } %>
+                        </div>
+                        <!-- Size Selector -->
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="text-sm">Size:</span>
+                            <div
+                                class="flex items-center gap-1 bg-white rounded px-2 py-1">
+                                <button
+                                    type="button"
+                                    class="size-prev text-gray-600 hover:text-black text-sm"
+                                    data-product="<%= product._id %>">
+                                    &lt;
+                                </button>
+                                <span
+                                    class="size-display text-xs font-semibold mx-2 text-black min-w-[30px] text-center"
+                                    data-product="<%= product._id %>"
+                                    data-sizes="<%= (product.sizes || ['S', 'M', 'L', 'XL', 'XXL']).join(',') %>">
+                                    M
+                                </span>
+                                <button
+                                    type="button"
+                                    class="size-next text-gray-600 hover:text-black text-sm"
+                                    data-product="<%= product._id %>">
+                                    &gt;
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <% const isInCart =
                     cartProductIds.includes(product._id.toString()); %>
@@ -132,12 +159,18 @@
 function addToCart(productId) {
   const btn = document.getElementById(`cartBtn-${productId}`);
   const icon = document.getElementById(`cartIcon-${productId}`);
+  const sizeDisplay = document.querySelector(`.size-display[data-product="${productId}"]`);
+  const selectedSize = sizeDisplay ? sizeDisplay.textContent : 'M';
   
   // Disable button while processing
   btn.disabled = true;
    fetch(`/addtocart/${productId}`, {
     method: "post",
-    credentials: "include"
+    credentials: "include",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ size: selectedSize })
   })
   .then(res => res.json())
   .then(data => {
@@ -145,7 +178,7 @@ function addToCart(productId) {
       // Change icon to checkmark
       icon.className = "ri-check-line text-lg text-green-600";
       btn.classList.add("bg-green-100");
-      showToast("Added to Cart!", "success");
+      showToast(`Added to Cart! (Size: ${selectedSize})`, "success");
     } else {
       // Already in cart - show checkmark too
       icon.className = "ri-check-line text-lg text-green-600";
@@ -178,4 +211,43 @@ function showToast(message, type) {
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
+
+// Size selector functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const sizeDisplays = document.querySelectorAll('.size-display');
+  
+  sizeDisplays.forEach(display => {
+    const productId = display.dataset.product;
+    const sizes = display.dataset.sizes.split(',');
+    let currentIndex = sizes.indexOf('M') !== -1 ? sizes.indexOf('M') : 0;
+    
+    // Store current size in data attribute
+    display.dataset.currentIndex = currentIndex;
+    display.textContent = sizes[currentIndex];
+    
+    // Previous size button
+    const prevBtn = document.querySelector(`.size-prev[data-product="${productId}"]`);
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        currentIndex = (currentIndex - 1 + sizes.length) % sizes.length;
+        display.textContent = sizes[currentIndex];
+        display.dataset.currentIndex = currentIndex;
+      });
+    }
+    
+    // Next size button
+    const nextBtn = document.querySelector(`.size-next[data-product="${productId}"]`);
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        currentIndex = (currentIndex + 1) % sizes.length;
+        display.textContent = sizes[currentIndex];
+        display.dataset.currentIndex = currentIndex;
+      });
+    }
+  });
+});
 </script>

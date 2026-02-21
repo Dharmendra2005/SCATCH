@@ -106,7 +106,12 @@ app.use(async (req, res, next) => {
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  express.static(path.join(__dirname, "public"), {
+    maxAge: "1d", // Cache static files for 1 day
+    etag: true,
+  }),
+);
 
 app.use("/owners", ownersRouter);
 app.use("/users", usersRouter);
@@ -118,5 +123,5 @@ app.use("/upi", upiRouter);
 app.use("/", indexRouter);
 
 app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+  console.log("Server is running on  http://localhost:3000/");
 });

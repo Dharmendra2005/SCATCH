@@ -98,8 +98,44 @@ router.get("/profile", isLoggedIn, async (req, res) => {
 router.get("/myorders", isLoggedIn, async (req, res) => {
   try {
     const userId = req.user._id;
-    // const addresses = await addressModel.find({ user: userId });
-    res.render("myOrders", {userId});
+    const user = await userModel.findById(userId);
+
+    // Get orders and populate product details for each item
+    const orders = user.orders || [];
+
+    // Populate products and addresses for each order
+    const populatedOrders = await Promise.all(
+      orders.map(async (order) => {
+        const address = await addressModel.findById(order.address);
+        const populatedItems = await Promise.all(
+          order.items.map(async (item) => {
+            const productModel = require("../models/product-model");
+            const product = await productModel.findById(
+              item.product._id || item.product,
+            );
+            return {
+              product: product,
+              quantity: item.quantity,
+            };
+          }),
+        );
+        return {
+          orderId: order.orderId,
+          status: order.status,
+          paymentMethod: order.paymentMethod,
+          createdAt: order.createdAt,
+          items: populatedItems,
+          address: address,
+        };
+      }),
+    );
+
+    // Sort orders by date (most recent first)
+    populatedOrders.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+    );
+
+    res.render("myOrders", { orders: populatedOrders });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server Error" });

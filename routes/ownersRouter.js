@@ -66,7 +66,9 @@ router.get("/ownerdashboard", isOwnerLoggedIn, async (req, res) => {
           (order) => !order.hiddenFromDashboard,
         );
 
-        console.log(`User ${user.email}: Total orders: ${user.orders.length}, Visible orders: ${visibleOrders.length}`); // Debug log
+        console.log(
+          `User ${user.email}: Total orders: ${user.orders.length}, Visible orders: ${visibleOrders.length}`,
+        ); // Debug log
 
         if (visibleOrders.length === 0) return null; // Skip users with no visible orders
 
@@ -75,7 +77,9 @@ router.get("/ownerdashboard", isOwnerLoggedIn, async (req, res) => {
         return {
           ...user.toObject(),
           orders: visibleOrders, // Only show non-hidden orders
-          lastOrderDate: lastOrder ? lastOrder.createdAt : null,
+          lastOrderDate: lastOrder
+            ? lastOrder.createdAt || lastOrder.date
+            : null,
           totalOrders: visibleOrders.length,
         };
       })
@@ -103,16 +107,27 @@ router.delete(
       const userId = req.params.userId;
       const orderTimestamp = parseInt(req.params.orderID);
 
-      // console.log("Hiding order:", { userId, orderTimestamp }); 
+      // console.log("Hiding order:", { userId, orderTimestamp });
 
-      // Mark order as hidden from dashboard instead of deleting
-      const result = await userModel.updateOne(
+      // Try to find and update order by createdAt first
+      let result = await userModel.updateOne(
         {
           _id: userId,
           "orders.createdAt": new Date(orderTimestamp),
         },
         { $set: { "orders.$.hiddenFromDashboard": true } },
       );
+
+      // If not found by createdAt, try with date field
+      if (result.matchedCount === 0) {
+        result = await userModel.updateOne(
+          {
+            _id: userId,
+            "orders.date": new Date(orderTimestamp),
+          },
+          { $set: { "orders.$.hiddenFromDashboard": true } },
+        );
+      }
 
       // console.log("Update result:", result); // Debug log
 

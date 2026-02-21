@@ -196,8 +196,15 @@
                                 <% } %>
                                 <div
                                     class="w-[30%] mt-3 pt-3 flex justify-end items-center">
+                                    <%
+                                    const orderTimestamp = order.createdAt
+                                    ? new Date(order.createdAt).getTime()
+                                    : order.date
+                                    ? new Date(order.date).getTime()
+                                    : Date.now();
+                                    %>
                                     <button id="Hide"
-                                        onclick="removeProduct('<%= user._id %>', '<%= order.createdAt.getTime() %>')"
+                                        onclick="removeProduct('<%= user._id %>', '<%= orderTimestamp %>')"
                                         class="h-10 w-20 bg-red-400 text-white rounded hover:bg-red-800"
                                         type="button">Hide</button>
                                 </div>

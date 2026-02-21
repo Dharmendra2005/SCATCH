@@ -89,9 +89,11 @@ router.get("/orders-success", isLoggedIn, async (req, res) => {
       }));
 
     const newOrder = {
+      orderId: `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
       items: orderItems, // all cart items with quantity
       address: addressId, // store address ID reference, not full object
       paymentMethod: "Stripe",
+      status: "confirmed",
       createdAt: new Date(),
     };
     // console.log(newOrder);

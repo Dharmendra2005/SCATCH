@@ -28,7 +28,12 @@
 
         <!-- NAME + QTY -->
         <div class="flex justify-between items-center px-7 py-3">
-          <h3 class="font-semibold text-sm"><%= item.name %></h3>
+          <div>
+            <h3 class="font-semibold text-sm"><%= item.name %></h3>
+            <% if (item.size) { %>
+            <span class="text-xs text-gray-600">Size: <%= item.size %></span>
+            <% } %>
+          </div>
 
           <div
             class="flex items-center gap-1 quantity-control"
@@ -68,7 +73,8 @@
           </button>
 
           <% if (item.discount > 0) { %>
-          <p class="text-sm rounded bg-green-100 text-green-600 px-2 py-1"><%= item.discount %>% OFF</p>
+          <p class="text-sm rounded bg-green-100 text-green-600 px-2 py-1"><%=
+            item.discount %>% OFF</p>
           <% } %>
         </div>
 
@@ -148,13 +154,6 @@
 
 <!-- ================= JS ================= -->
 
-<script>
-  let btn = document.getElementById("Goto");
-  btn.addEventListener("click", function(event) {
-   event.preventDefault();
-  });
-
-</script>
 <script>
   const platformFee = 35;
 

@@ -13,6 +13,10 @@ const productSchema = mongoose.Schema(
     panelcolor: String,
     textcolor: String,
     quantity: Number,
+    sizes: {
+      type: [String],
+      default: ["S", "M", "L", "XL", "XXL"],
+    },
   },
   { timestamps: true },
 );

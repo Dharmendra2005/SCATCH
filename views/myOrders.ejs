@@ -1,4 +1,249 @@
 <%- include('./partials/header') %>
 
+<div class="min-h-screen pt-20 pb-10 px-4 md:px-8 bg-secondary">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-primary">My Orders</h1>
 
-<%- include('./partials/header') %>
+        <% if(orders && orders.length > 0) { %>
+        <div class="space-y-4">
+            <% orders.forEach((order, index) => { %>
+            <div
+                class="bg-primary rounded-xl shadow-md overflow-hidden border border-custom order-card cursor-pointer transition-all hover:shadow-lg"
+                onclick="toggleOrderDetails('<%= index %>')">
+
+                <!-- Order Header -->
+                <div class="p-4 flex justify-between items-center">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <span class="text-sm font-semibold text-tertiary">
+                                <%= order.orderId || `Order #${index + 1}` %>
+                            </span>
+                            <span
+                                class="text-xs px-3 py-1 rounded-full font-medium
+                                        <% if(order.status === 'pending') { %>
+                                            bg-yellow-100 text-yellow-800
+                                        <% } else if(order.status === 'confirmed') { %>
+                                            bg-blue-100 text-blue-800
+                                        <% } else if(order.status === 'shipped') { %>
+                                            bg-purple-100 text-purple-800
+                                        <% } else if(order.status === 'delivered') { %>
+                                            bg-green-100 text-green-800
+                                        <% } else if(order.status === 'cancelled') { %>
+                                            bg-red-100 text-red-800
+                                        <% } else { %>
+                                            bg-gray-100 text-gray-800
+                                        <% } %>
+                                    ">
+                                <%= order.status ?
+                                order.status.charAt(0).toUpperCase() +
+                                order.status.slice(1) : 'Processing' %>
+                            </span>
+                        </div>
+                        <p class="text-sm text-tertiary mt-1">
+                            <i class="ri-calendar-line"></i>
+                            <%= new
+                            Date(order.createdAt).toLocaleDateString('en-IN', {
+                            day: 'numeric', month: 'short', year: 'numeric' })
+                            %>
+                        </p>
+                        <p class="text-sm text-tertiary">
+                            <i class="ri-bank-card-line"></i>
+                            <%= order.paymentMethod || 'N/A' %>
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg font-bold text-primary">
+                            ₹<%= order.items.reduce((total, item) => {
+                            if(item.product) {
+                            const price = item.product.price || 0;
+                            const discount = item.product.discount || 0;
+                            const qty = item.quantity || 1;
+                            return total + (price - (price * discount / 100)) *
+                            qty;
+                            }
+                            return total;
+                            }, 0).toFixed(0) %>
+                        </span>
+                        <i
+                            class="ri-arrow-down-s-line text-2xl text-tertiary transition-transform duration-300"
+                            id="arrow-<%= index %>"></i>
+                    </div>
+                </div>
+
+                <!-- Order Details (Hidden by default) -->
+                <div id="details-<%= index %>"
+                    class="hidden border-t border-custom">
+
+                    <!-- Status Timeline -->
+                    <div class="p-4 bg-tertiary/30">
+                        <h3
+                            class="text-sm font-semibold mb-3 text-secondary">Order
+                            Status</h3>
+                        <div class="flex items-center justify-between relative">
+                            <% const statuses = ['pending', 'confirmed',
+                            'shipped', 'delivered'];
+                            const currentStatusIndex =
+                            statuses.indexOf(order.status);
+                            %>
+                            <% statuses.forEach((status, i) => { %>
+                            <div
+                                class="flex flex-col items-center z-10 relative">
+                                <div
+                                    class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+                                                <% if(order.status === 'cancelled') { %>
+                                                    bg-red-500 text-white
+                                                <% } else if(i <= currentStatusIndex) { %>
+                                                    bg-green-500 text-white
+                                                <% } else { %>
+                                                    bg-gray-300 text-gray-600
+                                                <% } %>
+                                            ">
+                                    <% if(order.status === 'cancelled' && i ===
+                                    currentStatusIndex + 1) { %>
+                                    <i class="ri-close-line"></i>
+                                    <% } else if(i < currentStatusIndex) { %>
+                                    <i class="ri-check-line"></i>
+                                    <% } else { %>
+                                    <%= i + 1 %>
+                                    <% } %>
+                                </div>
+                                <span
+                                    class="text-xs mt-1 text-tertiary capitalize"><%=
+                                    status %></span>
+                            </div>
+                            <% if(i < statuses.length - 1) { %>
+                            <div class="flex-1 h-1 mx-2
+                                                <% if(i < currentStatusIndex) { %>
+                                                    bg-green-500
+                                                <% } else { %>
+                                                    bg-gray-300
+                                                <% } %>
+                                            "></div>
+                            <% } %>
+                            <% }); %>
+                        </div>
+                        <% if(order.status === 'cancelled') { %>
+                        <p class="text-red-500 text-sm mt-2 text-center">This
+                            order has been cancelled</p>
+                        <% } %>
+                    </div>
+
+                    <!-- Products List -->
+                    <div class="p-4">
+                        <h3
+                            class="text-sm font-semibold mb-3 text-secondary">Items
+                            (<%= order.items.length %>)</h3>
+                        <div class="space-y-3">
+                            <% order.items.forEach(item => { %>
+                            <% if(item.product) { %>
+                            <div
+                                class="flex items-center gap-3 p-2 rounded-lg bg-tertiary/30">
+                                <div
+                                    class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0"
+                                    style="background-color: <%= item.product.bgcolor || '#f3f4f6' %>">
+                                    <% if(item.product.image) { %>
+                                    <img
+                                        src="data:image/jpeg;base64,<%= item.product.image.toString('base64') %>"
+                                        alt="<%= item.product.name %>"
+                                        class="w-full h-full object-contain p-1">
+                                    <% } else { %>
+                                    <div
+                                        class="w-full h-full flex items-center justify-center">
+                                        <i
+                                            class="ri-shopping-bag-line text-2xl text-tertiary"></i>
+                                    </div>
+                                    <% } %>
+                                </div>
+                                <div class="flex-1">
+                                    <h4
+                                        class="font-medium text-primary text-sm"><%=
+                                        item.product.name %></h4>
+                                    <p class="text-xs text-tertiary">Qty: <%=
+                                        item.quantity || 1 %></p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-semibold text-primary">
+                                        ₹<%= ((item.product.price -
+                                        (item.product.price *
+                                        (item.product.discount || 0) / 100)) *
+                                        (item.quantity || 1)).toFixed(0) %>
+                                    </p>
+                                    <% if(item.product.discount > 0) { %>
+                                    <p
+                                        class="text-xs text-tertiary line-through">₹<%=
+                                        (item.product.price * (item.quantity ||
+                                        1)).toFixed(0) %></p>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <% } %>
+                            <% }); %>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Address -->
+                    <% if(order.address) { %>
+                    <div class="p-4 border-t border-custom">
+                        <h3
+                            class="text-sm font-semibold mb-2 text-secondary">Delivery
+                            Address</h3>
+                        <div class="text-sm text-tertiary">
+                            <p class="font-medium text-primary"><%=
+                                order.address.name || 'N/A' %></p>
+                            <% if(order.address.House_no) { %>
+                            <p><%= order.address.House_no %></p>
+                            <% } %>
+                            <p><%= order.address.Address || '' %></p>
+                            <% if(order.address.PinCode) { %>
+                            <p>PIN: <%= order.address.PinCode %></p>
+                            <% } %>
+                            <% if(order.address.Mobile_no) { %>
+                            <p><i class="ri-phone-line"></i> <%=
+                                order.address.Mobile_no %></p>
+                            <% } %>
+                            <% if(order.address.addressType) { %>
+                            <span
+                                class="inline-block mt-1 text-xs px-2 py-1 rounded bg-tertiary capitalize">
+                                <%= order.address.addressType %>
+                            </span>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+        <% } else { %>
+        <div
+            class="bg-primary rounded-xl shadow-md p-10 text-center border border-custom">
+            <i class="ri-shopping-bag-line text-6xl text-tertiary mb-4"></i>
+            <h2 class="text-xl font-semibold text-primary mb-2">No Orders
+                Yet</h2>
+            <p class="text-tertiary mb-6">You haven't placed any orders yet.
+                Start shopping to see your orders here!</p>
+            <a href="/shop"
+                class="inline-block px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
+                Start Shopping
+            </a>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+function toggleOrderDetails(index) {
+    const details = document.getElementById(`details-${index}`);
+    const arrow = document.getElementById(`arrow-${index}`);
+    
+    if (details.classList.contains('hidden')) {
+        details.classList.remove('hidden');
+        arrow.classList.add('rotate-180');
+    } else {
+        details.classList.add('hidden');
+        arrow.classList.remove('rotate-180');
+    }
+}
+</script>
+
+<%- include('./partials/footer') %>

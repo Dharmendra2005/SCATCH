@@ -35,9 +35,11 @@ router.get("/orders-place-cod", isLoggedIn, async (req, res) => {
     }
 
     const newOrder = {
+      orderId: `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
       items: orderItems,
       address: addressId,
       paymentMethod: "COD",
+      status: "pending",
       createdAt: new Date(),
     };
 

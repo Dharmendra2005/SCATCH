@@ -91,6 +91,7 @@ router.get("/cart", isLoggedIn, async (req, res) => {
         panelcolor: item.product.panelcolor,
         textcolor: item.product.textcolor,
         quantity: item.quantity,
+        size: item.size || "M",
       })) || [];
 
     res.render("cart", { cartItems, loggedin: true });
@@ -105,6 +106,7 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
   try {
     const productId = req.params.productId;
     const userId = req.user._id;
+    const { size } = req.body;
 
     // Check if product exists
     const product = await productModel.findById(productId);
@@ -122,9 +124,9 @@ router.post("/addtocart/:productId", isLoggedIn, async (req, res) => {
       return res.json({ success: false, message: "Product already in cart" });
     }
 
-    // Add product to user's cart
+    // Add product to user's cart with size
     await userModel.findByIdAndUpdate(userId, {
-      $push: { cart: { product: productId, quantity: 1 } },
+      $push: { cart: { product: productId, quantity: 1, size: size || "M" } },
     });
 
     res.json({ success: true, message: "Product added to cart" });
@@ -157,7 +159,7 @@ router.post("/checkout", isLoggedIn, async (req, res) => {
     const order = {
       items: orderItems,
       total: subtotal + 35, // Adding platform fee
-      date: new Date(),
+      createdAt: new Date(),
     };
 
     // Add to user's orders and clear cart
@@ -166,11 +168,11 @@ router.post("/checkout", isLoggedIn, async (req, res) => {
       $set: { cart: [] },
     });
 
-    req.flash("success", "Order placed successfully!");
+    req.flash("success", "Cart is cleared!");
     res.redirect("/shop");
   } catch (error) {
     console.error("Checkout error:", error);
-    req.flash("error", "Failed to place order");
+    req.flash("error", "Failed to clear cart");
     res.redirect("/cart");
   }
 });
