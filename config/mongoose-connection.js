@@ -1,15 +1,27 @@
-const mongoose = require('mongoose');
-const config = require('config');
+const mongoose = require("mongoose");
 
-const dbgr = require('debug')("development:mongoose");
+const MONGODB_URI = process.env.MONGODB_URI;
 
-mongoose.connect(`${config.get("MONGODB_URI")}/scatch`)
-.then(function(){
-    dbgr("Connected");
-})
-.catch(function(err){
-    dbgr(err);
-    console.error('MongoDB connection error:', err);
-})
+if (!MONGODB_URI) {
+  throw new Error("MONGODB_URI is not set in environment variables");
+}
+
+let isConnected = false;
+
+async function connectDB() {
+  if (isConnected) return mongoose.connection;
+
+  try {
+    await mongoose.connect(MONGODB_URI, { dbName: "scatch" });
+    isConnected = true;
+    console.log("MongoDB connected");
+    return mongoose.connection;
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+    throw err;
+  }
+}
+
+connectDB();
 
 module.exports = mongoose.connection;

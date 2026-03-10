@@ -190,7 +190,7 @@ router.get("/create", (req, res) => {
 //     const { username, email, password } = req.body;
 
 //     // check if owner already exists
-//     const existingOwner = await ownersModel.findOne({ email });
+//     const existingOwner = await ownerModel.findOne({ email });
 //     if (existingOwner) {
 //       return res.status(400).json({
 //         success: false,
@@ -201,7 +201,7 @@ router.get("/create", (req, res) => {
 //     const salt = await bcrypt.genSalt(12);
 //     const hash = await bcrypt.hash(password, salt);
 
-//     const owner = await ownersModel.create({
+//     const owner = await ownerModel.create({
 //       username,
 //       email,
 //       password: hash,
@@ -212,7 +212,6 @@ router.get("/create", (req, res) => {
 //       message: "Owner created successfully",
 //       ownerId: owner._id,
 //     });
-
 //   } catch (err) {
 //     console.error(err);
 //     res.status(500).json({ success: false });

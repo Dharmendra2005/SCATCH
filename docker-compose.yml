@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: scatch-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=scatch
+    networks:
+      - scatch-network
+
+  app:
+    build: .
+    container_name: scatch-app
+    restart: always
+    ports:
+      - "5000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017
+      - JWT_KEY=${JWT_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+    depends_on:
+      - mongodb
+    networks:
+      - scatch-network
+    volumes:
+      - ./public:/app/public
+      - ./views:/app/views
+
+networks:
+  scatch-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

@@ -115,7 +115,7 @@
   <% } %>
 
   <!-- Admin Access: always visible -->
-  <% if (!ownerLoggedIn) { %>
+  <% if (!ownerLoggedIn && !loggedin) { %>
     <a href="/create" class="ri-admin-line text-2xl hover:text-blue-500"></a>
   <% } %>
 
