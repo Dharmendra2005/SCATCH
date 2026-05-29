@@ -58,44 +58,426 @@
 
     // Apply theme classes when DOM is loaded
     document.addEventListener('DOMContentLoaded', applyThemeClasses);
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const profilePanel = document.getElementById('profilePanel');
+        const openProfileBtn = document.getElementById('openProfileBtn');
+        const closeProfileBtn = document.getElementById('closeProfile');
+        const profileSectionButtons = document.querySelectorAll('[data-panel-target]');
+        const profileSections = document.querySelectorAll('[data-panel-section]');
+        const profilePanelTitle = document.getElementById('profilePanelTitle');
+        const savedAddressStatus = document.getElementById('savedAddressStatus');
+        const savedAddressList = document.getElementById('savedAddressList');
+        const editProfileForm = document.getElementById('editProfileForm');
+        const editProfileStatus = document.getElementById('editProfileStatus');
+        const editProfileSubmitBtn = document.getElementById('editProfileSubmitBtn');
+        const contactUsForm = document.getElementById('contactUsForm');
+        const contactFormStatus = document.getElementById('contactFormStatus');
+        const contactSubmitBtn = document.getElementById('contactSubmitBtn');
+
+        let addressesLoaded = false;
+
+        function escapeHtml(value) {
+        return String(value || '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+        }
+
+        function openProfilePanel(section = 'overview') {
+        if (!profilePanel) return;
+
+        profilePanel.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            profilePanel.classList.remove('translate-x-full');
+        });
+
+        setProfileSection(section);
+        }
+
+        function closeProfilePanel() {
+        if (!profilePanel) return;
+
+        profilePanel.classList.add('translate-x-full');
+        setTimeout(() => {
+            profilePanel.classList.add('hidden');
+        }, 300);
+        }
+
+        function setProfileSection(section) {
+        profileSections.forEach((panelSection) => {
+            const isActive = panelSection.getAttribute('data-panel-section') === section;
+            panelSection.classList.toggle('hidden', !isActive);
+        });
+
+        profileSectionButtons.forEach((button) => {
+            const isActive = button.getAttribute('data-panel-target') === section;
+            button.classList.toggle('bg-gray-900', isActive);
+            button.classList.toggle('text-white', isActive);
+            button.classList.toggle('bg-gray-100', !isActive);
+            button.classList.toggle('text-gray-600', !isActive);
+        });
+
+        if (profilePanelTitle) {
+            if (section === 'addresses') {
+                profilePanelTitle.textContent = 'Saved Address';
+            } else if (section === 'edit') {
+                profilePanelTitle.textContent = 'Edit My Profile';
+            } else if (section === 'contact') {
+                profilePanelTitle.textContent = 'Contact Us';
+            } else {
+                profilePanelTitle.textContent = 'My Profile';
+            }
+        }
+
+        if (section === 'addresses') {
+            loadSavedAddresses();
+        }
+
+        if (section === 'contact' && contactFormStatus) {
+            contactFormStatus.textContent = '';
+            contactFormStatus.className = 'text-xs text-gray-500';
+        }
+
+        if (section === 'edit' && editProfileStatus) {
+            editProfileStatus.textContent = '';
+            editProfileStatus.className = 'text-xs text-gray-500';
+        }
+        }
+
+        async function loadSavedAddresses() {
+        if (!savedAddressStatus || !savedAddressList || addressesLoaded) return;
+
+        addressesLoaded = true;
+        savedAddressStatus.textContent = 'Loading your saved addresses...';
+        savedAddressList.innerHTML = '';
+
+        try {
+            const response = await fetch('/users/profile/addresses', {
+                credentials: 'include',
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Failed to load saved addresses');
+            }
+
+            const addresses = data.addresses || [];
+
+            if (!addresses.length) {
+                savedAddressStatus.textContent = 'No saved addresses found yet.';
+                return;
+            }
+
+            savedAddressStatus.textContent = '';
+            savedAddressList.innerHTML = addresses
+                .map((address) => {
+                    const badgeClass = address.defaultAddress
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : 'bg-gray-100 text-gray-600';
+
+                    return `
+                        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-semibold text-gray-900">${escapeHtml(address.name || 'Saved Address')}</p>
+                                    <p class="mt-1 text-sm text-gray-600">${escapeHtml(address.House_no || '')}${address.House_no && address.Address ? ', ' : ''}${escapeHtml(address.Address || '')}</p>
+                                    <p class="mt-1 text-sm text-gray-600">PIN: ${escapeHtml(address.PinCode || '')}</p>
+                                    <p class="mt-1 text-sm text-gray-600">Mobile: ${escapeHtml(address.Mobile_no || '')}</p>
+                                </div>
+                                <span class="rounded-full px-2 py-1 text-[11px] font-semibold uppercase tracking-wide ${badgeClass}">
+                                    ${escapeHtml(address.addressType || 'saved')}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                })
+                .join('');
+        } catch (error) {
+            savedAddressStatus.textContent = error.message || 'Unable to load saved addresses.';
+            addressesLoaded = false;
+        }
+        }
+
+        if (openProfileBtn && profilePanel) {
+            openProfileBtn.addEventListener('click', () => openProfilePanel('overview'));
+        }
+
+        if (closeProfileBtn) {
+            closeProfileBtn.addEventListener('click', closeProfilePanel);
+        }
+
+        profileSectionButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const targetSection = button.getAttribute('data-panel-target') || 'overview';
+                setProfileSection(targetSection);
+            });
+        });
+
+        const editProfileTrigger = document.querySelector('[data-open-edit-profile]');
+        if (editProfileTrigger) {
+            editProfileTrigger.addEventListener('click', () => setProfileSection('edit'));
+        }
+
+        if (editProfileForm) {
+            editProfileForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const fullnameInput = editProfileForm.querySelector('input[name="fullname"]');
+                const emailInput = editProfileForm.querySelector('input[name="email"]');
+                const contactInput = editProfileForm.querySelector('input[name="contact"]');
+
+                if (!fullnameInput || !emailInput || !contactInput || !editProfileSubmitBtn || !editProfileStatus) return;
+
+                const fullname = fullnameInput.value.trim();
+                const email = emailInput.value.trim();
+                const contact = contactInput.value.trim();
+
+                if (!fullname || !email || !contact) {
+                    editProfileStatus.textContent = 'Please fill in all fields.';
+                    editProfileStatus.className = 'text-xs text-red-600';
+                    return;
+                }
+
+                editProfileSubmitBtn.disabled = true;
+                editProfileSubmitBtn.textContent = 'Saving...';
+
+                try {
+                    const response = await fetch('/users/profile/update', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Accept: 'application/json',
+                        },
+                        body: JSON.stringify({ fullname, email, contact }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || 'Failed to update profile');
+                    }
+
+                    editProfileStatus.textContent = data.message || 'Profile updated successfully.';
+                    editProfileStatus.className = 'text-xs text-emerald-600';
+
+                    const profileName = document.querySelector('#profilePanel [data-profile-name]');
+                    const profileEmail = document.querySelector('#profilePanel [data-profile-email]');
+                    const contactEmail = document.getElementById('contactEmail');
+
+                    if (profileName) profileName.textContent = data.user.fullname || data.user.username || 'User';
+                    if (profileEmail) profileEmail.textContent = data.user.email || '';
+                    if (contactEmail) contactEmail.value = data.user.email || '';
+                } catch (error) {
+                    editProfileStatus.textContent = error.message || 'Could not update profile.';
+                    editProfileStatus.className = 'text-xs text-red-600';
+                } finally {
+                    editProfileSubmitBtn.disabled = false;
+                    editProfileSubmitBtn.textContent = 'Save Changes';
+                }
+            });
+        }
+
+        if (contactUsForm) {
+            contactUsForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const emailInput = contactUsForm.querySelector('input[name="email"]');
+            const messageInput = contactUsForm.querySelector('textarea[name="message"]');
+
+            if (!emailInput || !messageInput || !contactSubmitBtn || !contactFormStatus) return;
+
+            const email = emailInput.value.trim();
+            const message = messageInput.value.trim();
+
+            if (!email || !message) {
+                contactFormStatus.textContent = 'Please fill in both fields.';
+                contactFormStatus.className = 'text-xs text-red-600';
+                return;
+            }
+
+            contactSubmitBtn.disabled = true;
+            contactSubmitBtn.textContent = 'Sending...';
+
+            try {
+                const response = await fetch('/users/contact', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                    },
+                    body: JSON.stringify({ email, message }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Failed to send message');
+                }
+
+                contactFormStatus.textContent = data.message || 'Your message has been sent.';
+                contactFormStatus.className = 'text-xs text-emerald-600';
+                messageInput.value = '';
+            } catch (error) {
+                contactFormStatus.textContent = error.message || 'Could not send your message.';
+                contactFormStatus.className = 'text-xs text-red-600';
+            } finally {
+                contactSubmitBtn.disabled = false;
+                contactSubmitBtn.textContent = 'Send Message';
+            }
+            });
+        }
+    });
 </script>
 
 <!-- Profile Panel -->
 <% if (loggedin && user) { %>
 <div
     id="profilePanel"
-    class="fixed top-0 right-0 hidden h-full w-80 bg-white  text-black shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
-    <div class="p-5 flex justify-between items-center border-b">
-        <h2 class="text-lg font-semibold">My Profile</h2>
-        <button id="closeProfile" class="text-xl cursor-pointer">✕</button>
-    </div>
-    
-    <!-- User Info Section -->
-    <div class="p-5 border-b">
-        <div class="flex items-center gap-3">
-            <% if (user.picture) { %>
-                <img src="<%= user.picture %>" alt="Profile" class="w-12 h-12 rounded-full object-cover">
-            <% } else { %>
-                <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white text-xl font-semibold">
-                    <%= user.fullname ? user.fullname.charAt(0).toUpperCase() : 'U' %>
-                </div>
-            <% } %>
+    class="fixed top-0 right-0 hidden h-full w-full max-w-sm bg-white text-black shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+    <div class="border-b border-gray-200 p-5">
+        <div class="flex items-start justify-between gap-3">
             <div>
-                <p class="font-semibold"><%= user.fullname || user.username || 'User' %></p>
-                <p class="text-sm text-gray-500"><%= user.email %></p>
+                <h2 id="profilePanelTitle" class="text-lg font-semibold">My Profile</h2>
+                <p class="mt-1 text-xs text-gray-500">Manage your account, addresses, and support request.</p>
             </div>
+            <button id="closeProfile" class="text-xl cursor-pointer">✕</button>
         </div>
     </div>
-    
-    <div class="p-5 space-y-4">
-        <a href="/profile" class="block hover:text-blue-500"><i class="ri-user-line mr-2"></i>My Account</a>
-        <a href="/users/myorders" class="block hover:text-blue-500"><i class="ri-shopping-bag-line mr-2"></i>My Orders</a>
-        <a href="/users/cart" class="block hover:text-blue-500"><i class="ri-shopping-cart-line mr-2"></i>My Cart</a>
-        <a href="#" class="block hover:text-blue-500"><i class="ri-map-pin-line mr-2"></i>Saved Address</a>
-        <a href="#" class="block hover:text-blue-500"><i class="ri-mail-line mr-2"></i>Contact Us</a>
-        <a href="#" class="block hover:text-blue-500"><i class="ri-image-edit-line mr-2"></i>Edit My Profile</a>
-        <hr class="my-2">
-        <a href="/logout" class="block text-red-500 hover:text-red-600"><i class="ri-logout-box-line mr-2"></i>Logout</a>
+
+    <div class="border-b border-gray-200 px-5 py-4">
+        <div class="grid grid-cols-3 gap-2 rounded-2xl bg-gray-100 p-1">
+            <button type="button" data-panel-target="overview" class="rounded-xl bg-gray-900 px-3 py-2 text-xs font-semibold text-white transition-colors">Profile</button>
+            <button type="button" data-panel-target="addresses" class="rounded-xl bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-600 transition-colors">Saved Address</button>
+            <button type="button" data-panel-target="contact" class="rounded-xl bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-600 transition-colors">Contact Us</button>
+        </div>
+    </div>
+
+    <div class="h-[calc(100%-9.5rem)] overflow-y-auto p-5">
+        <div data-panel-section="overview" class="space-y-4">
+            <div class="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                <div class="flex items-center gap-3">
+                    <% if (user.picture) { %>
+                        <img src="<%= user.picture %>" alt="Profile" class="w-12 h-12 rounded-full object-cover">
+                    <% } else { %>
+                        <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white text-xl font-semibold">
+                            <%= user.fullname ? user.fullname.charAt(0).toUpperCase() : 'U' %>
+                        </div>
+                    <% } %>
+                    <div>
+                        <p class="font-semibold" data-profile-name><%= user.fullname || user.username || 'User' %></p>
+                        <p class="text-sm text-gray-500" data-profile-email><%= user.email %></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3 rounded-2xl border border-gray-200 bg-white p-4">
+                <a href="/profile" class="block rounded-xl px-3 py-2 hover:bg-gray-100"><i class="ri-user-line mr-2"></i>My Account</a>
+                <a href="/users/myorders" class="block rounded-xl px-3 py-2 hover:bg-gray-100"><i class="ri-shopping-bag-line mr-2"></i>My Orders</a>
+                <a href="/users/cart" class="block rounded-xl px-3 py-2 hover:bg-gray-100"><i class="ri-shopping-cart-line mr-2"></i>My Cart</a>
+                <button type="button" data-panel-target="addresses" class="block w-full rounded-xl px-3 py-2 text-left hover:bg-gray-100"><i class="ri-map-pin-line mr-2"></i>Saved Address</button>
+                <button type="button" data-panel-target="contact" class="block w-full rounded-xl px-3 py-2 text-left hover:bg-gray-100"><i class="ri-mail-line mr-2"></i>Contact Us</button>
+                <button type="button" data-open-edit-profile class="block w-full rounded-xl px-3 py-2 text-left hover:bg-gray-100"><i class="ri-image-edit-line mr-2"></i>Edit My Profile</button>
+                <hr class="my-2 border-gray-200">
+                <a href="/logout" class="block rounded-xl px-3 py-2 text-red-500 hover:bg-red-50 hover:text-red-600"><i class="ri-logout-box-line mr-2"></i>Logout</a>
+            </div>
+        </div>
+
+        <div data-panel-section="edit" class="hidden space-y-4">
+            <form id="editProfileForm" class="space-y-4 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                <div>
+                    <label for="editFullname" class="mb-1 block text-sm font-medium text-gray-700">Full Name</label>
+                    <input
+                        id="editFullname"
+                        name="fullname"
+                        type="text"
+                        value="<%= user.fullname || '' %>"
+                        class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+                        placeholder="Your full name"
+                        required>
+                </div>
+
+                <div>
+                    <label for="editEmail" class="mb-1 block text-sm font-medium text-gray-700">Email</label>
+                    <input
+                        id="editEmail"
+                        name="email"
+                        type="email"
+                        value="<%= user.email || '' %>"
+                        class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+                        placeholder="you@example.com"
+                        required>
+                </div>
+
+                <div>
+                    <label for="editContact" class="mb-1 block text-sm font-medium text-gray-700">Mobile Number</label>
+                    <input
+                        id="editContact"
+                        name="contact"
+                        type="tel"
+                        value="<%= user.contact || '' %>"
+                        class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+                        placeholder="Mobile number"
+                        required>
+                </div>
+
+                <button
+                    id="editProfileSubmitBtn"
+                    type="submit"
+                    class="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700">
+                    Save Changes
+                </button>
+
+                <p id="editProfileStatus" class="text-xs text-gray-500"></p>
+            </form>
+        </div>
+
+        <div data-panel-section="addresses" class="hidden space-y-4">
+            <div class="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                <p class="text-sm text-gray-600" id="savedAddressStatus">Loading your saved addresses...</p>
+                <div id="savedAddressList" class="mt-4 space-y-3"></div>
+            </div>
+        </div>
+
+        <div data-panel-section="contact" class="hidden space-y-4">
+            <form id="contactUsForm" class="space-y-4 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                <div>
+                    <label for="contactEmail" class="mb-1 block text-sm font-medium text-gray-700">Your Email</label>
+                    <input
+                        id="contactEmail"
+                        name="email"
+                        type="email"
+                        value="<%= user.email %>"
+                        class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+                        placeholder="you@example.com"
+                        required>
+                </div>
+
+                <div>
+                    <label for="contactMessage" class="mb-1 block text-sm font-medium text-gray-700">Message</label>
+                    <textarea
+                        id="contactMessage"
+                        name="message"
+                        rows="6"
+                        class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+                        placeholder="Tell us what you need help with"
+                        required></textarea>
+                </div>
+
+                <button
+                    id="contactSubmitBtn"
+                    type="submit"
+                    class="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700">
+                    Send Message
+                </button>
+
+                <p id="contactFormStatus" class="text-xs text-gray-500"></p>
+            </form>
+        </div>
     </div>
 </div>
 <% } %>

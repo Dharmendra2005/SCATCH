@@ -12,7 +12,7 @@ async function connectDB() {
   if (isConnected) return mongoose.connection;
 
   try {
-    await mongoose.connect(MONGODB_URI, { dbName: "scatch" });
+    await mongoose.connect(MONGODB_URI, { dbName: "DataBase" });
     isConnected = true;
     console.log("MongoDB connected");
     return mongoose.connection;

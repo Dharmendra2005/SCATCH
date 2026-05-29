@@ -20,12 +20,12 @@ const upiRouter = require("./routes/upiRouter");
 
 const expressSession = require("express-session");
 
-// Enable compression for better performance
+
 app.use(compression());
 
 app.use(cookieParser());
 
-// Session and flash must come BEFORE auth middleware
+
 app.use(
   expressSession({
     resave: false,
@@ -35,7 +35,7 @@ app.use(
 );
 app.use(flash());
 
-// Cache user data to avoid repeated database calls
+
 const userCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 

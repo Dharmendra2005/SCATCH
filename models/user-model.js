@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
-  contact: Number,
+  contact: String,
   picture: String,
   Address: [
     {

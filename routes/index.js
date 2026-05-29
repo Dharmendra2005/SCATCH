@@ -184,7 +184,7 @@ router.get("/create", (req, res) => {
   res.render("owner-login", { error, success });
 });
 
-// Create Owner ONLY via Postman
+// // Create Owner ONLY via Postman
 // router.post("/create", async (req, res) => {
 //   try {
 //     const { username, email, password } = req.body;
@@ -236,6 +236,22 @@ router.post("/create", async (req, res) => {
     }
 
     const token = generateToken(owner);
+
+    const wantsJson =
+      req.xhr ||
+      (req.get("Accept") || "").includes("application/json") ||
+      (req.get("Content-Type") || "").includes("application/json") ||
+      req.query.api === "true";
+
+    if (wantsJson) {
+      return res.status(200).json({
+        success: true,
+        message: "Owner login successful",
+        owner: { _id: owner._id, username: owner.username, email: owner.email },
+        token,
+      });
+    }
+
     res.cookie("owner", token);
 
     req.flash("success", "Welcome, " + owner.username);

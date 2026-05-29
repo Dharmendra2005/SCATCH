@@ -20,6 +20,28 @@ module.exports.registerUser = async function (req, res) {
           password: hash,
         });
         let token = generateToken(user);
+
+        // Determine if client expects JSON (API / Postman) or a browser redirect
+        const wantsJson =
+          req.xhr ||
+          (req.get("Accept") || "").includes("application/json") ||
+          (req.get("Content-Type") || "").includes("application/json") ||
+          req.query.api === "true";
+
+        if (wantsJson) {
+          return res.status(201).json({
+            success: true,
+            message: "Registration successful",
+            user: {
+              _id: user._id,
+              fullname: user.fullname,
+              email: user.email,
+            },
+            token,
+          });
+        }
+
+        // Default behaviour for browser flows: set cookie and redirect
         res.cookie("token", token);
         req.flash("success", "Registration successful! Welcome to Scatch");
         return res.redirect("/shop");

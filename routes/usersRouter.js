@@ -9,6 +9,9 @@ const {
 
 const isLoggedIn = require("../middlewares/isLoggedIn");
 const addressModel = require("../models/address-model");
+const contactMessageModel = require("../models/contact-message-model");
+const { generateToken } = require("../utils/generateToken");
+const mongoose = require("mongoose");
 
 // router.get("/", (req, res) => {
 //   res.send("hello Dharm U r doing good job till now !");
@@ -95,6 +98,110 @@ router.get("/profile", isLoggedIn, async (req, res) => {
   }
 });
 
+router.get("/profile/addresses", isLoggedIn, async (req, res) => {
+  try {
+    const addresses = await addressModel
+      .find({ user: req.user._id })
+      .sort({ defaultAddress: -1, createdAt: -1 })
+      .lean();
+
+    res.json({ success: true, addresses });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to load saved addresses",
+    });
+  }
+});
+
+router.post("/contact", isLoggedIn, async (req, res) => {
+  try {
+    const email = (req.body.email || req.user.email || "").trim();
+    const message = (req.body.message || "").trim();
+
+    if (!email || !message) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and message are required",
+      });
+    }
+
+    await contactMessageModel.create({
+      user: req.user._id,
+      email,
+      message,
+    });
+
+    res.json({
+      success: true,
+      message: "Your message has been sent successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to send your message",
+    });
+  }
+});
+
+router.post("/profile/update", isLoggedIn, async (req, res) => {
+  try {
+    const fullname = (req.body.fullname || "").trim();
+    const email = (req.body.email || "").trim().toLowerCase();
+    const contact = (req.body.contact || "").trim();
+
+    if (!fullname || !email || !contact) {
+      return res.status(400).json({
+        success: false,
+        message: "Full name, email, and mobile number are required",
+      });
+    }
+
+    const existingUser = await userModel.findOne({
+      email,
+      _id: { $ne: req.user._id },
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "This email is already in use",
+      });
+    }
+
+    const updatedUser = await userModel
+      .findByIdAndUpdate(
+        req.user._id,
+        {
+          $set: {
+            fullname,
+            email,
+            contact,
+          },
+        },
+        { new: true },
+      )
+      .select("-password");
+
+    const token = generateToken(updatedUser);
+    res.cookie("token", token);
+
+    res.json({
+      success: true,
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update profile",
+    });
+  }
+});
+
 router.get("/myorders", isLoggedIn, async (req, res) => {
   try {
     const userId = req.user._id;
@@ -139,6 +246,24 @@ router.get("/myorders", isLoggedIn, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// Dev-only debug route to check DB connection details
+router.get("/debug/db", async (req, res) => {
+  try {
+    if (process.env.NODE_ENV === "production") {
+      return res.status(404).json({ success: false });
+    }
+
+    const uri = process.env.MONGODB_URI || null;
+    const readyState = mongoose.connection.readyState; // 0 = disconnected, 1 = connected
+    const dbName = mongoose.connection.name || null;
+
+    res.json({ success: true, uri, readyState, dbName });
+  } catch (err) {
+    console.error("debug db error", err);
+    res.status(500).json({ success: false, message: "debug failed" });
   }
 });
 module.exports = router;

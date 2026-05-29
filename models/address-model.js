@@ -16,6 +16,8 @@ const addressSchema = new mongoose.Schema({
     enum: ["home", "office"]
   },
   defaultAddress: Boolean
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.models.address || mongoose.model("address", addressSchema);
