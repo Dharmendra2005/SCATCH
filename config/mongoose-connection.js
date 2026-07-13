@@ -12,7 +12,9 @@ async function connectDB() {
   if (isConnected) return mongoose.connection;
 
   try {
-    await mongoose.connect(MONGODB_URI, { dbName: "DataBase" });
+    const dbName = process.env.MONGODB_DB_NAME || "DataBase";
+
+    await mongoose.connect(MONGODB_URI, { dbName });
     isConnected = true;
     console.log("MongoDB connected");
     return mongoose.connection;

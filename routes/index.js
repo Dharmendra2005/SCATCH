@@ -184,7 +184,7 @@ router.get("/create", (req, res) => {
   res.render("owner-login", { error, success });
 });
 
-// // Create Owner ONLY via Postman
+// Create Owner ONLY via Postman
 // router.post("/create", async (req, res) => {
 //   try {
 //     const { username, email, password } = req.body;
@@ -219,7 +219,7 @@ router.get("/create", (req, res) => {
 // });
 
 // Owner Login (UI)
-router.post("/create", async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
