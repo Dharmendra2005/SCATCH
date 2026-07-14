@@ -122,6 +122,14 @@ app.use("/stripe", stripeRouter);
 app.use("/upi", upiRouter);
 app.use("/", indexRouter);
 
+app.use((req, res) => {
+  if (req.method === "GET") {
+    return res.redirect("/");
+  }
+
+  return res.status(404).json({ success: false, message: "Not found" });
+});
+
 if (!process.env.VERCEL) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
